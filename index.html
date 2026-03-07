@@ -317,10 +317,91 @@
     </div>
    </div>
    
-   <div id="toast" class="hidden fixed bottom-4 right-4 sm:top-4 sm:bottom-auto w-[90%] sm:w-auto left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-auto bg-green-600 text-white px-6 py-4 rounded-xl shadow-2xl toast z-[100] text-center sm:text-left font-bold text-sm sm:text-base">
-       <span id="toast-message"></span>
+   <div id="edit-report-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 transition-opacity">
+    <div class="bg-white rounded-2xl w-full max-w-4xl p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+     <div class="flex justify-between items-center border-b border-amber-100 pb-4 mb-6">
+       <h3 class="text-xl sm:text-2xl font-black text-amber-900">Editar Reporte</h3>
+       <button onclick="closeEditReportModal()" class="text-gray-400 hover:text-red-500"><i data-lucide="x" class="w-6 h-6"></i></button>
+     </div>
+     
+     <div class="space-y-6">
+      <input type="hidden" id="edit-report-id">
+      <input type="hidden" id="edit-initial-bultos">
+      <input type="hidden" id="edit-initial-kilos">
+
+      <h3 class="font-bold text-amber-800 text-lg border-b border-amber-100 pb-2">Consumo de Harina</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="p-4 border-2 border-amber-100 rounded-xl bg-gray-50/50">
+          <h4 class="font-bold text-amber-900 mb-3">Maseca Premium</h4>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="block text-xs font-bold text-amber-600 mb-1">Bultos</label> <input type="number" id="edit-maseca-bultos" min="0" oninput="editCalculateFinalStock()" class="w-full px-3 py-2 rounded-lg border-2 border-amber-200 focus:border-amber-400 outline-none font-bold text-amber-900"></div>
+            <div><label class="block text-xs font-bold text-amber-600 mb-1">Kilos</label> <input type="number" id="edit-maseca-kilos" min="0" oninput="editCalculateFinalStock()" class="w-full px-3 py-2 rounded-lg border-2 border-amber-200 focus:border-amber-400 outline-none font-bold text-amber-900"></div>
+          </div>
+        </div>
+        <div class="p-4 border-2 border-amber-100 rounded-xl bg-gray-50/50">
+          <h4 class="font-bold text-amber-900 mb-3">Harimasa Blanca</h4>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="block text-xs font-bold text-amber-600 mb-1">Bultos</label> <input type="number" id="edit-blanca-bultos" min="0" oninput="editCalculateFinalStock()" class="w-full px-3 py-2 rounded-lg border-2 border-amber-200 focus:border-amber-400 outline-none font-bold text-amber-900"></div>
+            <div><label class="block text-xs font-bold text-amber-600 mb-1">Kilos</label> <input type="number" id="edit-blanca-kilos" min="0" oninput="editCalculateFinalStock()" class="w-full px-3 py-2 rounded-lg border-2 border-amber-200 focus:border-amber-400 outline-none font-bold text-amber-900"></div>
+          </div>
+        </div>
+        <div class="p-4 border-2 border-amber-100 rounded-xl bg-gray-50/50">
+          <h4 class="font-bold text-amber-900 mb-3">Harimasa Amarilla</h4>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="block text-xs font-bold text-amber-600 mb-1">Bultos</label> <input type="number" id="edit-amarilla-bultos" min="0" oninput="editCalculateFinalStock()" class="w-full px-3 py-2 rounded-lg border-2 border-amber-200 focus:border-amber-400 outline-none font-bold text-amber-900"></div>
+            <div><label class="block text-xs font-bold text-amber-600 mb-1">Kilos</label> <input type="number" id="edit-amarilla-kilos" min="0" oninput="editCalculateFinalStock()" class="w-full px-3 py-2 rounded-lg border-2 border-amber-200 focus:border-amber-400 outline-none font-bold text-amber-900"></div>
+          </div>
+        </div>
+        <div class="p-4 border-2 border-amber-100 rounded-xl bg-gray-50/50">
+          <h4 class="font-bold text-amber-900 mb-3">Harimasa Fardo</h4>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="block text-xs font-bold text-amber-600 mb-1">Bultos</label> <input type="number" id="edit-fardo-bultos" min="0" oninput="editCalculateFinalStock()" class="w-full px-3 py-2 rounded-lg border-2 border-amber-200 focus:border-amber-400 outline-none font-bold text-amber-900"></div>
+            <div><label class="block text-xs font-bold text-amber-600 mb-1">Kilos</label> <input type="number" id="edit-fardo-kilos" min="0" oninput="editCalculateFinalStock()" class="w-full px-3 py-2 rounded-lg border-2 border-amber-200 focus:border-amber-400 outline-none font-bold text-amber-900"></div>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="font-bold text-amber-800 text-lg mt-8 border-b border-amber-100 pb-2">Materiales</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="p-4 border-2 border-amber-100 rounded-xl text-center bg-gray-50/50 flex flex-col items-center justify-center">
+          <h4 class="font-bold text-amber-900 mb-3">Papel</h4>
+          <div class="flex justify-center gap-4">
+            <label class="flex items-center gap-1.5 cursor-pointer"><input type="radio" name="edit_papel" value="si" class="w-5 h-5 accent-amber-500"> <span class="text-amber-800 font-medium text-sm">Sí</span></label>
+            <label class="flex items-center gap-1.5 cursor-pointer"><input type="radio" name="edit_papel" value="no" class="w-5 h-5 accent-amber-500"> <span class="text-amber-800 font-medium text-sm">No</span></label>
+          </div>
+        </div>
+        <div class="p-4 border-2 border-amber-100 rounded-xl text-center bg-gray-50/50 flex flex-col items-center justify-center">
+          <h4 class="font-bold text-amber-900 mb-3">Teflón</h4>
+          <div class="flex justify-center gap-4">
+            <label class="flex items-center gap-1.5 cursor-pointer"><input type="radio" name="edit_teflon" value="si" class="w-5 h-5 accent-amber-500"> <span class="text-amber-800 font-medium text-sm">Sí</span></label>
+            <label class="flex items-center gap-1.5 cursor-pointer"><input type="radio" name="edit_teflon" value="no" class="w-5 h-5 accent-amber-500"> <span class="text-amber-800 font-medium text-sm">No</span></label>
+          </div>
+        </div>
+        <div class="p-4 border-2 border-amber-100 rounded-xl text-center bg-gray-50/50 flex flex-col items-center justify-center">
+          <h4 class="font-bold text-amber-900 mb-3">Grafito</h4>
+          <div class="flex justify-center gap-4">
+            <label class="flex items-center gap-1.5 cursor-pointer"><input type="radio" name="edit_grafito" value="si" class="w-5 h-5 accent-amber-500"> <span class="text-amber-800 font-medium text-sm">Sí</span></label>
+            <label class="flex items-center gap-1.5 cursor-pointer"><input type="radio" name="edit_grafito" value="no" class="w-5 h-5 accent-amber-500"> <span class="text-amber-800 font-medium text-sm">No</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 p-5 bg-green-50 rounded-xl border border-green-200">
+        <h3 class="font-black text-green-800 mb-4 text-center text-lg">Existencia Final Recalculada</h3>
+        <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto">
+          <div class="bg-white p-3 rounded-lg shadow-sm text-center border border-green-100"><span class="block text-xs text-green-600 uppercase font-bold mb-1">Bultos</span> <span id="edit-final-bultos-display" class="font-black text-2xl text-green-700">0</span></div>
+          <div class="bg-white p-3 rounded-lg shadow-sm text-center border border-green-100"><span class="block text-xs text-green-600 uppercase font-bold mb-1">Kilos</span> <span id="edit-final-kilos-display" class="font-black text-2xl text-green-700">0</span></div>
+        </div>
+      </div>
+
+     </div>
+     <div class="flex flex-col-reverse sm:flex-row gap-3 mt-8">
+         <button onclick="closeEditReportModal()" class="w-full sm:flex-1 py-3.5 border-2 border-amber-200 text-amber-700 font-bold rounded-xl hover:bg-amber-50 transition-colors">Cancelar</button> 
+         <button id="save-edit-report-btn" onclick="window.saveEditReport()" class="w-full sm:flex-1 py-3.5 btn-primary text-white font-bold rounded-xl shadow-md">Actualizar Reporte</button>
+     </div>
+    </div>
    </div>
-  </div>
+  
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -358,6 +439,10 @@
             updateBranchSelects();
             if (selectedBranchForReport) {
               renderCalendar();
+            }
+            // 🔥 ESTA ES LA LÍNEA QUE FALTABA PARA EL TIEMPO REAL 🔥
+            if (selectedBranchForReport && selectedDate) {
+              showReportDetail(selectedDate);
             }
           } else if (document.getElementById('employee-panel').classList.contains('hidden') === false) {
              const branch = getBranches().find(b => b.branch_name === currentUser.branch_name);
@@ -483,6 +568,9 @@
     }
 
     function logout() {
+
+        const inputs = ['maseca-bultos', 'maseca-kilos', 'harimasa-blanca-bultos', 'harimasa-blanca-kilos', 'harimasa-amarilla-bultos', 'harimasa-amarilla-kilos', 'harimasa-fardo-bultos', 'harimasa-fardo-kilos'];
+      inputs.forEach(id => { if(document.getElementById(id)) document.getElementById(id).value = ''; });
       currentUser = null;
       document.getElementById('login-screen').classList.remove('hidden');
       document.getElementById('admin-panel').classList.add('hidden');
@@ -490,6 +578,11 @@
       document.getElementById('login-username').value = '';
       document.getElementById('login-password').value = '';
       document.getElementById('login-error').classList.add('hidden');
+
+      // 🔥 LIMPIAMOS LOS DATOS AL SALIR 🔥
+      if (window.limpiarFormularioEmpleado) {
+          window.limpiarFormularioEmpleado();
+      }
 
       closeMobileMenu();
 
@@ -748,6 +841,35 @@
         }
     }
 
+    // ================= ESCOBA VIRTUAL (LIMPIEZA DE FORMULARIO) =================
+    window.limpiarFormularioEmpleado = function() {
+        // 1. Forzar el vaciado de todas las casillas de texto
+        const casillas = [
+            'maseca-bultos', 'maseca-kilos', 
+            'harimasa-blanca-bultos', 'harimasa-blanca-kilos',
+            'harimasa-amarilla-bultos', 'harimasa-amarilla-kilos', 
+            'harimasa-fardo-bultos', 'harimasa-fardo-kilos'
+        ];
+        
+        casillas.forEach(id => {
+            const elemento = document.getElementById(id);
+            if (elemento) elemento.value = ''; // Lo dejamos en blanco totalmente
+        });
+
+        // 2. Regresar los materiales a 'No'
+        ['papel', 'teflon', 'grafito'].forEach(material => {
+            const radioNo = document.querySelector(`input[name="${material}"][value="no"]`);
+            if (radioNo) radioNo.checked = true;
+        });
+
+        // 3. Forzar el recálculo visual para que la caja verde quede en ceros o en el stock actual
+        calculateFinalStock();
+        
+        // 4. Regresar la pantalla hacia arriba
+        const scroll = document.getElementById('employee-scroll');
+        if (scroll) scroll.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     // ================= CALENDARIO =================
     function renderCalendar() {
       const container = document.getElementById('calendar-container');
@@ -760,7 +882,7 @@
       const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
       const dayNames = ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa'];
 
-      const reports = getReports().filter(r => r.branch_id === selectedBranchForReport);
+      const reports = getReports().filter(r => r.branch_id === selectedBranchForReport || r.branch_name === selectedBranchForReport);
       const reportDates = reports.map(r => r.report_date);
 
       let html = `
@@ -808,7 +930,7 @@
 
     function showReportDetail(dateStr) {
       const container = document.getElementById('report-detail');
-      const report = getReports().find(r => r.report_date === dateStr && r.branch_id === selectedBranchForReport);
+      const report = getReports().find(r => r.report_date === dateStr && (r.branch_id === selectedBranchForReport || r.branch_name === selectedBranchForReport));
 
       if (!report) {
         container.innerHTML = `
@@ -877,11 +999,20 @@
               </div>
             </div>
           </div>
+
+          <div class="mt-6 flex flex-col sm:flex-row gap-3 border-t border-amber-100 pt-5">
+            <button onclick="editReport('${report.__backendId}')" class="flex-1 py-2.5 bg-blue-50 text-blue-600 font-bold rounded-xl hover:bg-blue-100 transition-colors flex items-center justify-center gap-2 shadow-sm">
+              <i data-lucide="edit" class="w-4 h-4"></i> Editar Reporte
+            </button>
+            <button onclick="deleteReport('${report.__backendId}')" class="flex-1 py-2.5 bg-red-50 text-red-600 font-bold rounded-xl hover:bg-red-100 transition-colors flex items-center justify-center gap-2 shadow-sm">
+              <i data-lucide="trash-2" class="w-4 h-4"></i> Eliminar
+            </button>
+          </div>
+
         </div>
       `;
       lucide.createIcons();
     }
-
     // ================= FUNCIONES EMPLEADO =================
     function calculateFinalStock() {
       const branch = getBranches().find(b => b.branch_name === currentUser?.branch_name);
@@ -923,7 +1054,7 @@
           finalContainer.classList.remove('border-red-500');
       }
     }
-
+    
     async function submitReport() {
       if (isSubmitting) return;
 
@@ -933,86 +1064,97 @@
         return;
       }
 
+      // 1. Validación de seguridad
+      const getVal = (id) => parseInt(document.getElementById(id)?.value) || 0;
+      const consumedBultos = getVal('maseca-bultos') + getVal('harimasa-blanca-bultos') + getVal('harimasa-amarilla-bultos') + getVal('harimasa-fardo-bultos');
+      const consumedKilos = getVal('maseca-kilos') + getVal('harimasa-blanca-kilos') + getVal('harimasa-amarilla-kilos') + getVal('harimasa-fardo-kilos');
+
+      if (consumedBultos === 0 && consumedKilos === 0) {
+          showToast('Debes capturar al menos un consumo para enviar el reporte', true);
+          return;
+      }
+
       isSubmitting = true;
       const btn = document.getElementById('submit-report-btn');
       btn.innerHTML = '<i class="lucide-loader animate-spin inline w-6 h-6 mr-2"></i> Enviando...';
       btn.disabled = true;
 
-      const today = new Date();
-      const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-
-      const consumedBultos = 
-        (parseInt(document.getElementById('maseca-bultos').value) || 0) +
-        (parseInt(document.getElementById('harimasa-blanca-bultos').value) || 0) +
-        (parseInt(document.getElementById('harimasa-amarilla-bultos').value) || 0) +
-        (parseInt(document.getElementById('harimasa-fardo-bultos').value) || 0);
-
-      const consumedKilos = 
-        (parseInt(document.getElementById('maseca-kilos').value) || 0) +
-        (parseInt(document.getElementById('harimasa-blanca-kilos').value) || 0) +
-        (parseInt(document.getElementById('harimasa-amarilla-kilos').value) || 0) +
-        (parseInt(document.getElementById('harimasa-fardo-kilos').value) || 0);
-
-      const totalConsumedKilos = (consumedBultos * 20) + consumedKilos;
-      const totalInitialKilos = ((branch.initial_stock_bultos || 0) * 20) + (branch.initial_stock_kilos || 0);
-      let newTotalKilos = totalInitialKilos - totalConsumedKilos;
-      
-      if (newTotalKilos < 0) newTotalKilos = 0;
-      
-      const newBultos = Math.max(0, Math.floor(newTotalKilos / 20));
-      const newKilos = Math.max(0, newTotalKilos % 20);
-
-      const reportData = {
-        type: 'report',
-        report_date: dateStr,
-        branch_id: currentUser.branch_name,
-        branch_name: currentUser.branch_name,
-        initial_stock_bultos: branch.initial_stock_bultos || 0,
-        initial_stock_kilos: branch.initial_stock_kilos || 0,
-        maseca_premium_bultos: parseInt(document.getElementById('maseca-bultos').value) || 0,
-        maseca_premium_kilos: parseInt(document.getElementById('maseca-kilos').value) || 0,
-        harimasa_blanca_bultos: parseInt(document.getElementById('harimasa-blanca-bultos').value) || 0,
-        harimasa_blanca_kilos: parseInt(document.getElementById('harimasa-blanca-kilos').value) || 0,
-        harimasa_amarilla_bultos: parseInt(document.getElementById('harimasa-amarilla-bultos').value) || 0,
-        harimasa_amarilla_kilos: parseInt(document.getElementById('harimasa-amarilla-kilos').value) || 0,
-        harimasa_fardo_bultos: parseInt(document.getElementById('harimasa-fardo-bultos').value) || 0,
-        harimasa_fardo_kilos: parseInt(document.getElementById('harimasa-fardo-kilos').value) || 0,
-        tiene_papel: document.querySelector('input[name="papel"]:checked')?.value === 'si',
-        tiene_teflon: document.querySelector('input[name="teflon"]:checked')?.value === 'si',
-        tiene_grafito: document.querySelector('input[name="grafito"]:checked')?.value === 'si',
-        existencia_final_bultos: parseInt(document.getElementById('final-bultos').textContent) || 0,
-        existencia_final_kilos: parseInt(document.getElementById('final-kilos').textContent) || 0,
-        submitted_by: currentUser.username,
-        submitted_at: new Date().toISOString()
-      };
-
       try {
-        await addDoc(collection(db, 'reports'), reportData);
+        const today = new Date();
+        const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
         
-        const branchRef = doc(db, 'branches', branch.__backendId);
-        await updateDoc(branchRef, {
-            initial_stock_bultos: newBultos,
-            initial_stock_kilos: newKilos
+        const totalConsumedKilos = (consumedBultos * 20) + consumedKilos;
+        const totalInitialKilos = ((branch.initial_stock_bultos || 0) * 20) + (branch.initial_stock_kilos || 0);
+        let newTotalKilos = Math.max(0, totalInitialKilos - totalConsumedKilos);
+        
+        const reportData = {
+          type: 'report',
+          report_date: dateStr,
+          branch_id: branch.__backendId || currentUser.branch_name,
+          branch_name: currentUser.branch_name,
+          initial_stock_bultos: branch.initial_stock_bultos || 0,
+          initial_stock_kilos: branch.initial_stock_kilos || 0,
+          maseca_premium_bultos: getVal('maseca-bultos'),
+          maseca_premium_kilos: getVal('maseca-kilos'),
+          harimasa_blanca_bultos: getVal('harimasa-blanca-bultos'),
+          harimasa_blanca_kilos: getVal('harimasa-blanca-kilos'),
+          harimasa_amarilla_bultos: getVal('harimasa-amarilla-bultos'),
+          harimasa_amarilla_kilos: getVal('harimasa-amarilla-kilos'),
+          harimasa_fardo_bultos: getVal('harimasa-fardo-bultos'),
+          harimasa_fardo_kilos: getVal('harimasa-fardo-kilos'),
+          tiene_papel: document.querySelector('input[name="papel"]:checked')?.value === 'si',
+          tiene_teflon: document.querySelector('input[name="teflon"]:checked')?.value === 'si',
+          tiene_grafito: document.querySelector('input[name="grafito"]:checked')?.value === 'si',
+          existencia_final_bultos: parseInt(document.getElementById('final-bultos').textContent) || 0,
+          existencia_final_kilos: parseInt(document.getElementById('final-kilos').textContent) || 0,
+          submitted_by: currentUser.username,
+          submitted_at: new Date().toISOString()
+        };
+
+        // Guardar en Firebase
+        await addDoc(collection(db, 'reports'), reportData);
+        await updateDoc(doc(db, 'branches', branch.__backendId), {
+            initial_stock_bultos: Math.floor(newTotalKilos / 20),
+            initial_stock_kilos: newTotalKilos % 20
         });
 
-        showToast('¡Reporte enviado y existencia actualizada!');
-        
-        document.querySelectorAll('#employee-panel input[type="number"]').forEach(input => input.value = 0);
-        document.querySelectorAll('#employee-panel input[type="radio"][value="no"]').forEach(radio => radio.checked = true);
-        
-        // El scroll automatico sube al inicio despues de enviar
-        document.getElementById('employee-scroll').scrollTo({ top: 0, behavior: 'smooth' });
-        
+        showToast('¡Reporte enviado exitosamente!');
+
       } catch (error) {
-        showToast('Error al enviar reporte o actualizar existencia', true);
+        showToast('Error al enviar reporte', true);
+        console.error("Fallo:", error);
       } finally {
+        // 🔥 ESTE BLOQUE SE EJECUTA SIEMPRE (EXITO O ERROR) 🔥
+        const inputs = [
+            'maseca-bultos', 'maseca-kilos', 
+            'harimasa-blanca-bultos', 'harimasa-blanca-kilos',
+            'harimasa-amarilla-bultos', 'harimasa-amarilla-kilos', 
+            'harimasa-fardo-bultos', 'harimasa-fardo-kilos'
+        ];
+        
+        // Vaciado forzado de valores
+        inputs.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = ''; 
+        });
+
+        // Reinicio de materiales
+        ['papel', 'teflon', 'grafito'].forEach(name => {
+            const noRadio = document.querySelector(`input[name="${name}"][value="no"]`);
+            if (noRadio) noRadio.checked = true;
+        });
+
+        calculateFinalStock(); // Actualiza cuadro verde
+        
         isSubmitting = false;
         btn.innerHTML = '<i data-lucide="send" class="w-6 h-6"></i> Enviar Reporte Oficial';
         btn.disabled = false;
-        lucide.createIcons();
+        
+        // Scroll hacia arriba
+        document.getElementById('employee-scroll')?.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
-
+   
     // ================= MODALS UI =================
     function openUserModal() {
       document.getElementById('user-modal').classList.remove('hidden');
@@ -1138,7 +1280,222 @@
       document.getElementById('user-modal').addEventListener('click', (e) => { if (e.target.id === 'user-modal') closeUserModal(); });
       document.getElementById('branch-modal').addEventListener('click', (e) => { if (e.target.id === 'branch-modal') closeBranchModal(); });
       document.getElementById('restock-modal').addEventListener('click', (e) => { if (e.target.id === 'restock-modal') closeRestockModal(); });
+      document.getElementById('save-edit-report-btn').addEventListener('click', saveEditReport);
     }
+
+    // ================= CRUD REPORTES (ADMIN) =================
+    async function deleteReport(id) {
+      if(!confirm("¿Estás seguro de que deseas eliminar este reporte? Esto devolverá la harina consumida al stock de la sucursal y borrará el registro de forma permanente.")) return;
+      
+      try {
+        // 1. Buscamos los datos del reporte ANTES de eliminarlo
+        const report = getReports().find(r => r.__backendId === id);
+        if (!report) {
+            showToast('Error: Reporte no encontrado', true);
+            return;
+        }
+
+        // 2. Calculamos el total de kilos que se consumieron en ese reporte
+        const consumedBultos = 
+            (report.maseca_premium_bultos || 0) + 
+            (report.harimasa_blanca_bultos || 0) + 
+            (report.harimasa_amarilla_bultos || 0) + 
+            (report.harimasa_fardo_bultos || 0);
+            
+        const consumedKilos = 
+            (report.maseca_premium_kilos || 0) + 
+            (report.harimasa_blanca_kilos || 0) + 
+            (report.harimasa_amarilla_kilos || 0) + 
+            (report.harimasa_fardo_kilos || 0);
+
+        const totalConsumedKilos = (consumedBultos * 20) + consumedKilos;
+
+        // 3. Buscamos la sucursal a la que le pertenece el reporte
+        const branch = getBranches().find(b => b.branch_name === report.branch_name);
+        
+        // 4. Si encontramos la sucursal y hubo consumo, le regresamos el stock
+        if (branch && totalConsumedKilos > 0) {
+            const currentBranchKilos = ((branch.initial_stock_bultos || 0) * 20) + (branch.initial_stock_kilos || 0);
+            const newTotalKilos = currentBranchKilos + totalConsumedKilos;
+            
+            const newBultos = Math.floor(newTotalKilos / 20);
+            const newKilos = newTotalKilos % 20;
+
+            const branchRef = doc(db, 'branches', branch.__backendId);
+            await updateDoc(branchRef, {
+                initial_stock_bultos: newBultos,
+                initial_stock_kilos: newKilos
+            });
+        }
+
+        // 5. Ahora sí, eliminamos el reporte de Firebase
+        await deleteDoc(doc(db, 'reports', id));
+        
+        showToast('Reporte eliminado y stock restaurado');
+        selectedDate = null; 
+        renderCalendar();
+        
+        document.getElementById('report-detail').innerHTML = `
+          <div class="text-center text-amber-600 py-12">
+            <i data-lucide="check-circle" class="w-16 h-16 mx-auto mb-4 opacity-50 text-green-500"></i>
+            <p>Reporte eliminado y stock devuelto a la sucursal exitosamente.</p>
+          </div>`;
+        lucide.createIcons();
+      } catch(e) {
+        showToast('Error al procesar la eliminación', true);
+        console.error(e);
+      }
+    }
+
+    // ================= FUNCIONES DE EDICIÓN DE REPORTE =================
+    
+    // Función que calcula en vivo el stock final al editar
+    function editCalculateFinalStock() {
+      const initialBultos = parseInt(document.getElementById('edit-initial-bultos').value) || 0;
+      const initialKilos = parseInt(document.getElementById('edit-initial-kilos').value) || 0;
+
+      const consumedBultos = 
+        (parseInt(document.getElementById('edit-maseca-bultos').value) || 0) +
+        (parseInt(document.getElementById('edit-blanca-bultos').value) || 0) +
+        (parseInt(document.getElementById('edit-amarilla-bultos').value) || 0) +
+        (parseInt(document.getElementById('edit-fardo-bultos').value) || 0);
+
+      const consumedKilos = 
+        (parseInt(document.getElementById('edit-maseca-kilos').value) || 0) +
+        (parseInt(document.getElementById('edit-blanca-kilos').value) || 0) +
+        (parseInt(document.getElementById('edit-amarilla-kilos').value) || 0) +
+        (parseInt(document.getElementById('edit-fardo-kilos').value) || 0);
+
+      const totalConsumedKilos = (consumedBultos * 20) + consumedKilos;
+      const totalInitialKilos = (initialBultos * 20) + initialKilos;
+
+      const finalKilos = totalInitialKilos - totalConsumedKilos;
+      const finalBultos = Math.floor(finalKilos / 20);
+      const remainingKilos = finalKilos % 20;
+
+      const displayBultos = finalKilos < 0 ? 0 : finalBultos;
+      const displayKilos = finalKilos < 0 ? 0 : remainingKilos;
+
+      document.getElementById('edit-final-bultos-display').textContent = displayBultos;
+      document.getElementById('edit-final-kilos-display').textContent = displayKilos;
+    }
+
+    // ================= FUNCIONES DE EDICIÓN DE REPORTE =================
+
+    window.editCalculateFinalStock = function() {
+      const initialBultos = parseInt(document.getElementById('edit-initial-bultos').value) || 0;
+      const initialKilos = parseInt(document.getElementById('edit-initial-kilos').value) || 0;
+
+      const consumedBultos = 
+        (parseInt(document.getElementById('edit-maseca-bultos').value) || 0) +
+        (parseInt(document.getElementById('edit-blanca-bultos').value) || 0) +
+        (parseInt(document.getElementById('edit-amarilla-bultos').value) || 0) +
+        (parseInt(document.getElementById('edit-fardo-bultos').value) || 0);
+
+      const consumedKilos = 
+        (parseInt(document.getElementById('edit-maseca-kilos').value) || 0) +
+        (parseInt(document.getElementById('edit-blanca-kilos').value) || 0) +
+        (parseInt(document.getElementById('edit-amarilla-kilos').value) || 0) +
+        (parseInt(document.getElementById('edit-fardo-kilos').value) || 0);
+
+      const totalConsumedKilos = (consumedBultos * 20) + consumedKilos;
+      const totalInitialKilos = (initialBultos * 20) + initialKilos;
+
+      const finalKilos = totalInitialKilos - totalConsumedKilos;
+      const finalBultos = Math.floor(finalKilos / 20);
+      const remainingKilos = finalKilos % 20;
+
+      document.getElementById('edit-final-bultos-display').textContent = finalKilos < 0 ? 0 : finalBultos;
+      document.getElementById('edit-final-kilos-display').textContent = finalKilos < 0 ? 0 : remainingKilos;
+    };
+
+    window.editReport = function(id) {
+      const report = getReports().find(r => r.__backendId === id);
+      if (!report) return;
+
+      document.getElementById('edit-report-id').value = id;
+      document.getElementById('edit-initial-bultos').value = report.initial_stock_bultos || 0;
+      document.getElementById('edit-initial-kilos').value = report.initial_stock_kilos || 0;
+      
+      document.getElementById('edit-maseca-bultos').value = report.maseca_premium_bultos || 0;
+      document.getElementById('edit-maseca-kilos').value = report.maseca_premium_kilos || 0;
+      document.getElementById('edit-blanca-bultos').value = report.harimasa_blanca_bultos || 0;
+      document.getElementById('edit-blanca-kilos').value = report.harimasa_blanca_kilos || 0;
+      document.getElementById('edit-amarilla-bultos').value = report.harimasa_amarilla_bultos || 0;
+      document.getElementById('edit-amarilla-kilos').value = report.harimasa_amarilla_kilos || 0;
+      document.getElementById('edit-fardo-bultos').value = report.harimasa_fardo_bultos || 0;
+      document.getElementById('edit-fardo-kilos').value = report.harimasa_fardo_kilos || 0;
+
+      const papelVal = report.tiene_papel ? 'si' : 'no';
+      const teflonVal = report.tiene_teflon ? 'si' : 'no';
+      const grafitoVal = report.tiene_grafito ? 'si' : 'no';
+      
+      const papelInput = document.querySelector(`input[name="edit_papel"][value="${papelVal}"]`);
+      if(papelInput) papelInput.checked = true;
+      
+      const teflonInput = document.querySelector(`input[name="edit_teflon"][value="${teflonVal}"]`);
+      if(teflonInput) teflonInput.checked = true;
+      
+      const grafitoInput = document.querySelector(`input[name="edit_grafito"][value="${grafitoVal}"]`);
+      if(grafitoInput) grafitoInput.checked = true;
+
+      window.editCalculateFinalStock();
+      document.getElementById('edit-report-modal').classList.remove('hidden');
+    };
+
+    window.closeEditReportModal = function() {
+      document.getElementById('edit-report-modal').classList.add('hidden');
+    };
+
+    window.saveEditReport = async function() {
+      const id = document.getElementById('edit-report-id').value;
+      if(!id) return;
+
+      const btn = document.getElementById('save-edit-report-btn');
+      btn.innerHTML = '<i class="lucide-loader animate-spin inline w-4 h-4 mr-2"></i> Actualizando...';
+      btn.disabled = true;
+
+      try {
+        const reportRef = doc(db, 'reports', id);
+        
+        await updateDoc(reportRef, {
+          maseca_premium_bultos: parseInt(document.getElementById('edit-maseca-bultos').value) || 0,
+          maseca_premium_kilos: parseInt(document.getElementById('edit-maseca-kilos').value) || 0,
+          harimasa_blanca_bultos: parseInt(document.getElementById('edit-blanca-bultos').value) || 0,
+          harimasa_blanca_kilos: parseInt(document.getElementById('edit-blanca-kilos').value) || 0,
+          harimasa_amarilla_bultos: parseInt(document.getElementById('edit-amarilla-bultos').value) || 0,
+          harimasa_amarilla_kilos: parseInt(document.getElementById('edit-amarilla-kilos').value) || 0,
+          harimasa_fardo_bultos: parseInt(document.getElementById('edit-fardo-bultos').value) || 0,
+          harimasa_fardo_kilos: parseInt(document.getElementById('edit-fardo-kilos').value) || 0,
+          tiene_papel: document.querySelector('input[name="edit_papel"]:checked')?.value === 'si',
+          tiene_teflon: document.querySelector('input[name="edit_teflon"]:checked')?.value === 'si',
+          tiene_grafito: document.querySelector('input[name="edit_grafito"]:checked')?.value === 'si',
+          existencia_final_bultos: parseInt(document.getElementById('edit-final-bultos-display').textContent) || 0,
+          existencia_final_kilos: parseInt(document.getElementById('edit-final-kilos-display').textContent) || 0
+        });
+
+        showToast('Reporte actualizado exitosamente');
+        window.closeEditReportModal();
+        
+        // ¡Listo! Ya no hay setTimeout aquí. El onDataChanged se encarga de actualizar la vista de forma nativa.
+
+      } catch (error) {
+        console.error("Error capturado de Firebase: ", error);
+        showToast('Error al conectar con la base de datos', true);
+      } finally {
+        btn.innerHTML = 'Actualizar Reporte';
+        btn.disabled = false;
+      }
+    };
+   
+
+    // 🔥 ESTO ES LO QUE SOLUCIONA EL ERROR DEL ONCLICK 🔥
+    // Pon esto justo antes de init();
+    window.deleteReport = deleteReport;
+    window.editReport = editReport;
+    window.closeEditReportModal = closeEditReportModal;
+    window.saveEditReport = saveEditReport;
+    window.editCalculateFinalStock = editCalculateFinalStock; // <-- Agrega esta línea
 
     // Arrancar la App
     init();
@@ -1149,4 +1506,4 @@
     });
   </script>
  </body>
-</html>
+</html> 
