@@ -1,4 +1,1345 @@
-// ================= ENVÍO DE REPORTE (EMPLEADO) =================
+<!doctype html>
+<html lang="es" class="h-full">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xavi - Sistema Multi-Sucursal</title>
+
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    <script src="/_sdk/element_sdk.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+        }
+
+        .card-shadow {
+            box-shadow: 0 10px 40px rgba(217, 119, 6, 0.15);
+        }
+
+        .input-focus:focus {
+            box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.3);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(217, 119, 6, 0.4);
+        }
+
+        .sidebar-item {
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-item:hover {
+            background: rgba(251, 191, 36, 0.1);
+        }
+
+        .sidebar-item.active {
+            background: rgba(251, 191, 36, 0.2);
+            border-left: 4px solid #f59e0b;
+        }
+
+        .calendar-day {
+            transition: all 0.2s ease;
+        }
+
+        .calendar-day:hover {
+            background: #fef3c7;
+        }
+
+        .calendar-day.has-report {
+            background: #d1fae5;
+        }
+
+        .calendar-day.selected {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .toast {
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #fcd34d;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #fbbf24;
+        }
+
+        body {
+            box-sizing: border-box;
+        }
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+
+<body class="h-full">
+
+    <div id="loading-screen"
+        class="fixed inset-0 z-[100] bg-gradient-to-br from-[#f8981d] to-[#e65c00] flex flex-col items-center justify-center transition-opacity duration-700">
+        <div class="relative flex items-center justify-center mb-6 h-32 w-32">
+            <i data-lucide="cloud" class="absolute w-28 h-28 text-white/40 animate-pulse"></i>
+            <span class="absolute text-5xl animate-bounce pb-6">🌽</span>
+        </div>
+        <h2 class="text-2xl font-extrabold text-white tracking-wide drop-shadow-md">Conectando a la nube...</h2>
+        <p class="text-orange-100 mt-2 text-sm animate-pulse">Sincronizando Firebase</p>
+    </div>
+
+    <div id="app" class="h-full overflow-hidden hidden">
+
+        <div id="login-screen"
+            class="h-full overflow-y-auto flex items-center justify-center p-4 sm:p-6 bg-gradient-to-br from-[#f8981d] to-[#e65c00]">
+            <div class="w-full max-w-[420px] bg-white rounded-2xl shadow-2xl px-6 py-10 sm:px-8">
+
+                <div class="text-center mb-8">
+                    <div
+                        class="w-24 h-24 mx-auto mb-4 bg-white rounded-full flex items-center justify-center shadow-[0_2px_15px_rgba(0,0,0,0.08)] p-1 overflow-hidden">
+                        <img src="xavi.jpg" alt="Logotipo Xavi" class="w-full h-full object-cover rounded-full">
+                    </div>
+                    <h1 id="app-title" class="text-[26px] font-bold text-slate-800 leading-tight">Xavi</h1>
+                    <p class="text-slate-500 mt-1 text-[13px] font-medium">Sistema Multi-Sucursal Comercializadora</p>
+                </div>
+
+                <div class="space-y-5">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-600 mb-1.5 text-left">Usuario</label>
+                        <input type="text" id="login-username"
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#f59e0b] focus:border-[#f59e0b] outline-none text-slate-700 placeholder-gray-400 transition-all"
+                            placeholder="Ej: sucursal uno">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-600 mb-1.5 text-left">Contraseña</label>
+                        <input type="password" id="login-password"
+                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#f59e0b] focus:border-[#f59e0b] outline-none text-slate-700 placeholder-gray-400 transition-all"
+                            placeholder="••••••••">
+                    </div>
+                    <div id="login-error"
+                        class="hidden text-red-600 text-sm text-center bg-red-50 p-2 rounded-lg font-medium"></div>
+
+                    <button id="login-btn"
+                        class="w-full py-3.5 bg-[#f59e0b] hover:bg-[#d97706] text-white font-bold rounded-lg shadow-sm transition-colors mt-2 text-[15px]">
+                        Ingresar al Sistema
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="admin-panel" class="hidden h-full flex relative bg-amber-50">
+
+            <div id="sidebar-overlay" class="hidden fixed inset-0 bg-black/50 z-30 md:hidden transition-opacity"></div>
+
+            <div id="admin-sidebar"
+                class="w-64 bg-white border-r border-amber-200 flex flex-col absolute z-40 h-full transform -translate-x-full transition-transform duration-300 md:relative md:translate-x-0 shadow-2xl md:shadow-none">
+                <div class="p-6 border-b border-amber-100 flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-12 h-12 bg-white rounded-full flex items-center justify-center shrink-0 shadow-sm p-0.5 border border-amber-200 overflow-hidden">
+                            <img src="xavi.jpg" alt="Logotipo Xavi" class="w-full h-full object-cover rounded-full">
+                        </div>
+                        <div class="overflow-hidden">
+                            <h2 class="font-bold text-amber-900 truncate">Panel Admin</h2>
+                            <p id="admin-username-display" class="text-xs text-amber-600 truncate"></p>
+                        </div>
+                    </div>
+                    <button id="close-menu-btn" class="md:hidden text-amber-500 hover:text-amber-800 p-1">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+                    <button data-section="users"
+                        class="sidebar-item active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-amber-800">
+                        <i data-lucide="users" class="w-5 h-5"></i> <span>Usuarios</span> </button>
+                    <button data-section="branches"
+                        class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-amber-800"> <i
+                            data-lucide="store" class="w-5 h-5"></i> <span>Sucursales</span> </button>
+                    <button data-section="reports"
+                        class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-amber-800"> <i
+                            data-lucide="file-text" class="w-5 h-5"></i> <span>Historial Reportes</span> </button>
+                </nav>
+                <div class="p-4 border-t border-amber-100">
+                    <button id="admin-logout"
+                        class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition-colors">
+                        <i data-lucide="log-out" class="w-5 h-5"></i> <span>Cerrar Sesión</span> </button>
+                </div>
+            </div>
+
+            <div class="flex-1 flex flex-col h-full overflow-hidden">
+                <div
+                    class="md:hidden bg-white border-b border-amber-200 p-4 flex items-center justify-between sticky top-0 z-20 shadow-sm">
+                    <div class="flex items-center gap-2">
+                        <div
+                            class="w-9 h-9 bg-white rounded-full flex items-center justify-center shadow-sm p-0.5 border border-amber-200 overflow-hidden">
+                            <img src="xavi.jpg" alt="Logotipo Xavi" class="w-full h-full object-cover rounded-full">
+                        </div>
+                        <h2 class="font-bold text-amber-900">Panel Admin</h2>
+                    </div>
+                    <button id="mobile-menu-btn"
+                        class="p-2 text-amber-900 bg-amber-50 rounded-lg hover:bg-amber-100 transition-colors">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                </div>
+
+                <div class="flex-1 overflow-auto pb-10">
+                    <div id="section-users" class="p-4 sm:p-8">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                            <h2 class="text-2xl font-bold text-amber-900">Control de Usuarios</h2>
+                            <button id="add-user-btn"
+                                class="w-full sm:w-auto justify-center btn-primary text-white px-5 py-2.5 rounded-xl flex items-center gap-2 shadow-md">
+                                <i data-lucide="plus" class="w-4 h-4"></i> Nuevo Usuario </button>
+                        </div>
+                        <div id="users-list" class="grid gap-4"></div>
+                    </div>
+
+                    <div id="section-branches" class="hidden p-4 sm:p-8">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                            <h2 class="text-2xl font-bold text-amber-900">Gestión de Sucursales</h2>
+                            <button id="add-branch-btn"
+                                class="w-full sm:w-auto justify-center btn-primary text-white px-5 py-2.5 rounded-xl flex items-center gap-2 shadow-md">
+                                <i data-lucide="plus" class="w-4 h-4"></i> Nueva Sucursal </button>
+                        </div>
+                        <div id="branches-list" class="grid gap-4"></div>
+                    </div>
+
+                    <div id="section-reports" class="hidden p-4 sm:p-8">
+                        <h2 class="text-2xl font-bold text-amber-900 mb-6">Historial de Reportes</h2>
+                        <div class="grid lg:grid-cols-3 gap-6">
+                            <div class="lg:col-span-1">
+                                <div class="bg-white rounded-2xl card-shadow p-5 sm:p-6"><label
+                                        class="block text-sm font-semibold text-amber-800 mb-3">Seleccionar
+                                        Sucursal</label> <select id="report-branch-select"
+                                        class="w-full px-4 py-3 rounded-xl border-2 border-amber-200 focus:border-amber-400 outline-none mb-6 text-sm">
+                                        <option value="">-- Seleccione --</option>
+                                    </select>
+                                    <div id="calendar-container"></div>
+                                </div>
+                            </div>
+                            <div class="lg:col-span-2">
+                                <div id="report-detail" class="bg-white rounded-2xl card-shadow p-5 sm:p-6">
+                                    <div class="text-center text-amber-600 py-12"><i data-lucide="calendar"
+                                            class="w-16 h-16 mx-auto mb-4 opacity-50"></i>
+                                        <p>Seleccione una sucursal y fecha para ver el reporte</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="employee-panel" class="hidden h-full bg-amber-50 flex flex-col overflow-hidden">
+            <div class="bg-white border-b border-amber-200 p-4 sticky top-0 z-20 shadow-sm shrink-0">
+                <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-3 w-full sm:w-auto justify-center sm:justify-start">
+                        <div
+                            class="w-11 h-11 bg-white rounded-full flex items-center justify-center shrink-0 shadow-sm p-0.5 border border-amber-200 overflow-hidden">
+                            <img src="xavi.jpg" alt="Logotipo Xavi" class="w-full h-full object-cover rounded-full">
+                        </div>
+                        <div class="text-center sm:text-left">
+                            <h2 class="font-bold text-amber-900 leading-tight text-lg">Panel Empleado</h2>
+                            <p id="employee-branch-display" class="text-xs sm:text-sm text-amber-600 font-semibold"></p>
+                        </div>
+                    </div>
+                    <button id="employee-logout"
+                        class="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-red-50 rounded-xl text-red-600 hover:bg-red-100 transition-colors font-bold text-sm">
+                        <i data-lucide="log-out" class="w-4 h-4"></i> <span>Cerrar Sesión</span> </button>
+                </div>
+            </div>
+
+            <div id="employee-scroll" class="flex-1 overflow-y-auto p-4 sm:p-6 pb-10">
+                <div class="max-w-4xl mx-auto bg-white rounded-2xl card-shadow p-5 sm:p-8">
+                    <div class="text-center mb-6 sm:mb-8">
+                        <h2 class="text-xl sm:text-2xl font-bold text-amber-900">Reporte del Día</h2>
+                        <p id="report-date-display" class="text-amber-600 text-sm sm:text-base capitalize"></p>
+                    </div>
+                    <div class="mb-6 sm:mb-8 p-4 bg-amber-50 rounded-xl border border-amber-100">
+                        <h3 class="font-bold text-amber-800 mb-3 text-sm sm:text-base text-center">Existencia Inicial de
+                            la Sucursal</h3>
+                        <div class="grid grid-cols-2 gap-4 max-w-md mx-auto">
+                            <div class="bg-white p-3 rounded-lg shadow-sm text-center border border-amber-100"><span
+                                    class="block text-xs text-amber-600 uppercase font-bold mb-1">Bultos</span> <span
+                                    id="initial-bultos" class="font-black text-2xl text-amber-900">0</span></div>
+                            <div class="bg-white p-3 rounded-lg shadow-sm text-center border border-amber-100"><span
+                                    class="block text-xs text-amber-600 uppercase font-bold mb-1">Kilos</span> <span
+                                    id="initial-kilos" class="font-black text-2xl text-amber-900">0</span></div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6 sm:space-y-8">
+                        <h3 class="font-bold text-amber-800 text-lg border-b border-amber-100 pb-2">Consumo de Harina
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="p-4 border-2 border-amber-100 rounded-xl bg-gray-50/50">
+                                <h4 class="font-bold text-amber-900 mb-3 text-center md:text-left">Maseca Premium</h4>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div><label class="block text-xs font-bold text-amber-600 mb-1">Bultos</label>
+                                        <input type="number" id="maseca-bultos" min="0" value="0"
+                                            class="w-full px-3 py-2 rounded-lg border-2 border-amber-200 focus:border-amber-400 outline-none text-center sm:text-left font-bold text-amber-900">
+                                    </div>
+                                    <div><label class="block text-xs font-bold text-amber-600 mb-1">Kilos</label> <input
+                                            type="number" id="maseca-kilos" min="0" value="0"
+                                            class="w-full px-3 py-2 rounded-lg border-2 border-amber-200 focus:border-amber-400 outline-none text-center sm:text-left font-bold text-amber-900">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-4 border-2 border-amber-100 rounded-xl bg-gray-50/50">
+                                <h4 class="font-bold text-amber-900 mb-3 text-center md:text-left">Harimasa Blanca</h4>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div><label class="block text-xs font-bold text-amber-600 mb-1">Bultos</label>
+                                        <input type="number" id="harimasa-blanca-bultos" min="0" value="0"
+                                            class="w-full px-3 py-2 rounded-lg border-2 border-amber-200 focus:border-amber-400 outline-none text-center sm:text-left font-bold text-amber-900">
+                                    </div>
+                                    <div><label class="block text-xs font-bold text-amber-600 mb-1">Kilos</label> <input
+                                            type="number" id="harimasa-blanca-kilos" min="0" value="0"
+                                            class="w-full px-3 py-2 rounded-lg border-2 border-amber-200 focus:border-amber-400 outline-none text-center sm:text-left font-bold text-amber-900">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-4 border-2 border-amber-100 rounded-xl bg-gray-50/50">
+                                <h4 class="font-bold text-amber-900 mb-3 text-center md:text-left">Harimasa Amarilla
+                                </h4>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div><label class="block text-xs font-bold text-amber-600 mb-1">Bultos</label>
+                                        <input type="number" id="harimasa-amarilla-bultos" min="0" value="0"
+                                            class="w-full px-3 py-2 rounded-lg border-2 border-amber-200 focus:border-amber-400 outline-none text-center sm:text-left font-bold text-amber-900">
+                                    </div>
+                                    <div><label class="block text-xs font-bold text-amber-600 mb-1">Kilos</label> <input
+                                            type="number" id="harimasa-amarilla-kilos" min="0" value="0"
+                                            class="w-full px-3 py-2 rounded-lg border-2 border-amber-200 focus:border-amber-400 outline-none text-center sm:text-left font-bold text-amber-900">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-4 border-2 border-amber-100 rounded-xl bg-gray-50/50">
+                                <h4 class="font-bold text-amber-900 mb-3 text-center md:text-left">Harimasa Fardo</h4>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div><label class="block text-xs font-bold text-amber-600 mb-1">Bultos</label>
+                                        <input type="number" id="harimasa-fardo-bultos" min="0" value="0"
+                                            class="w-full px-3 py-2 rounded-lg border-2 border-amber-200 focus:border-amber-400 outline-none text-center sm:text-left font-bold text-amber-900">
+                                    </div>
+                                    <div><label class="block text-xs font-bold text-amber-600 mb-1">Kilos</label> <input
+                                            type="number" id="harimasa-fardo-kilos" min="0" value="0"
+                                            class="w-full px-3 py-2 rounded-lg border-2 border-amber-200 focus:border-amber-400 outline-none text-center sm:text-left font-bold text-amber-900">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h3 class="font-bold text-amber-800 text-lg mt-8 border-b border-amber-100 pb-2">Materiales</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div
+                                class="p-4 border-2 border-amber-100 rounded-xl text-center bg-gray-50/50 flex flex-row sm:flex-col items-center justify-between sm:justify-center">
+                                <h4 class="font-bold text-amber-900 mb-0 sm:mb-3">Papel</h4>
+                                <div class="flex justify-center gap-4">
+                                    <label class="flex items-center gap-1.5 cursor-pointer"> <input type="radio"
+                                            name="papel" value="si" class="w-5 h-5 accent-amber-500"> <span
+                                            class="text-amber-800 font-medium text-sm">Sí</span> </label>
+                                    <label class="flex items-center gap-1.5 cursor-pointer"> <input type="radio"
+                                            name="papel" value="no" checked class="w-5 h-5 accent-amber-500"> <span
+                                            class="text-amber-800 font-medium text-sm">No</span> </label>
+                                </div>
+                            </div>
+                            <div
+                                class="p-4 border-2 border-amber-100 rounded-xl text-center bg-gray-50/50 flex flex-row sm:flex-col items-center justify-between sm:justify-center">
+                                <h4 class="font-bold text-amber-900 mb-0 sm:mb-3">Teflón</h4>
+                                <div class="flex justify-center gap-4">
+                                    <label class="flex items-center gap-1.5 cursor-pointer"> <input type="radio"
+                                            name="teflon" value="si" class="w-5 h-5 accent-amber-500"> <span
+                                            class="text-amber-800 font-medium text-sm">Sí</span> </label>
+                                    <label class="flex items-center gap-1.5 cursor-pointer"> <input type="radio"
+                                            name="teflon" value="no" checked class="w-5 h-5 accent-amber-500"> <span
+                                            class="text-amber-800 font-medium text-sm">No</span> </label>
+                                </div>
+                            </div>
+                            <div
+                                class="p-4 border-2 border-amber-100 rounded-xl text-center bg-gray-50/50 flex flex-row sm:flex-col items-center justify-between sm:justify-center">
+                                <h4 class="font-bold text-amber-900 mb-0 sm:mb-3">Grafito</h4>
+                                <div class="flex justify-center gap-4">
+                                    <label class="flex items-center gap-1.5 cursor-pointer"> <input type="radio"
+                                            name="grafito" value="si" class="w-5 h-5 accent-amber-500"> <span
+                                            class="text-amber-800 font-medium text-sm">Sí</span> </label>
+                                    <label class="flex items-center gap-1.5 cursor-pointer"> <input type="radio"
+                                            name="grafito" value="no" checked class="w-5 h-5 accent-amber-500"> <span
+                                            class="text-amber-800 font-medium text-sm">No</span> </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 p-5 sm:p-6 bg-green-50 rounded-xl border border-green-200">
+                            <h3 class="font-black text-green-800 mb-4 text-center text-lg sm:text-xl">Existencia Final
+                                (Restante)</h3>
+                            <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto">
+                                <div class="bg-white p-3 rounded-lg shadow-sm text-center border border-green-100"><span
+                                        class="block text-xs text-green-600 uppercase font-bold mb-1">Bultos</span>
+                                    <span id="final-bultos" class="font-black text-2xl text-green-700">0</span>
+                                </div>
+                                <div class="bg-white p-3 rounded-lg shadow-sm text-center border border-green-100"><span
+                                        class="block text-xs text-green-600 uppercase font-bold mb-1">Kilos</span> <span
+                                        id="final-kilos" class="font-black text-2xl text-green-700">0</span></div>
+                            </div>
+                            <p class="text-xs text-green-600 mt-4 text-center font-medium">* 1 bulto = 20 kg, rinde 41
+                                kg de masa</p>
+                        </div>
+
+                        <button id="submit-report-btn" onclick="window.submitReport()" class="w-full mt-8 py-4 sm:py-5 btn-primary text-white font-black rounded-xl flex items-center justify-center gap-2 text-lg shadow-lg hover:shadow-xl transition-all"> <i data-lucide="send" class="w-6 h-6"></i> Enviar Reporte Oficial </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="user-modal"
+            class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 transition-opacity">
+            <div class="bg-white rounded-2xl w-full max-w-md p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+                <h3 id="user-modal-title" class="text-xl sm:text-2xl font-black text-amber-900 mb-6">Nuevo Usuario</h3>
+                <div class="space-y-4"><input type="hidden" id="modal-user-id">
+                    <div><label class="block text-sm font-bold text-amber-800 mb-1.5">Nombre de Usuario</label> <input
+                            type="text" id="modal-username"
+                            class="w-full px-4 py-3 rounded-xl border-2 border-amber-200 focus:border-amber-400 outline-none transition-colors text-sm sm:text-base">
+                    </div>
+                    <div><label class="block text-sm font-bold text-amber-800 mb-1.5">Contraseña</label> <input
+                            type="password" id="modal-password"
+                            class="w-full px-4 py-3 rounded-xl border-2 border-amber-200 focus:border-amber-400 outline-none transition-colors text-sm sm:text-base">
+                    </div>
+                    <div><label class="block text-sm font-bold text-amber-800 mb-1.5">Sucursal</label> <select
+                            id="modal-branch"
+                            class="w-full px-4 py-3 rounded-xl border-2 border-amber-200 focus:border-amber-400 outline-none transition-colors text-sm sm:text-base">
+                            <option value="">-- Seleccione --</option>
+                        </select>
+                    </div>
+                    <div><label class="block text-sm font-bold text-amber-800 mb-1.5">Rol</label> <select
+                            id="modal-role"
+                            class="w-full px-4 py-3 rounded-xl border-2 border-amber-200 focus:border-amber-400 outline-none transition-colors text-sm sm:text-base">
+                            <option value="empleado">Empleado</option>
+                            <option value="admin">Administrador</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex flex-col-reverse sm:flex-row gap-3 mt-8">
+                    <button id="cancel-user-modal"
+                        class="w-full sm:flex-1 py-3.5 border-2 border-amber-200 text-amber-700 font-bold rounded-xl hover:bg-amber-50 transition-colors">Cancelar</button>
+                    <button id="save-user-btn"
+                        class="w-full sm:flex-1 py-3.5 btn-primary text-white font-bold rounded-xl shadow-md">Guardar</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="branch-modal"
+            class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 transition-opacity">
+            <div class="bg-white rounded-2xl w-full max-w-md p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+                <h3 id="branch-modal-title" class="text-xl sm:text-2xl font-black text-amber-900 mb-6">Nueva Sucursal
+                </h3>
+                <div class="space-y-4">
+                    <input type="hidden" id="modal-branch-id">
+                    <div><label class="block text-sm font-bold text-amber-800 mb-1.5">Nombre de Sucursal</label> <input
+                            type="text" id="modal-branch-name"
+                            class="w-full px-4 py-3 rounded-xl border-2 border-amber-200 focus:border-amber-400 outline-none transition-colors text-sm sm:text-base">
+                    </div>
+                    <div><label class="block text-sm font-bold text-amber-800 mb-1.5">Existencia Inicial
+                            (Bultos)</label> <input type="number" id="modal-initial-bultos" min="0" value="0"
+                            class="w-full px-4 py-3 rounded-xl border-2 border-amber-200 focus:border-amber-400 outline-none transition-colors text-sm sm:text-base">
+                    </div>
+                    <div><label class="block text-sm font-bold text-amber-800 mb-1.5">Existencia Inicial (Kilos)</label>
+                        <input type="number" id="modal-initial-kilos" min="0" value="0"
+                            class="w-full px-4 py-3 rounded-xl border-2 border-amber-200 focus:border-amber-400 outline-none transition-colors text-sm sm:text-base">
+                    </div>
+                </div>
+                <div class="flex flex-col-reverse sm:flex-row gap-3 mt-8">
+                    <button id="cancel-branch-modal"
+                        class="w-full sm:flex-1 py-3.5 border-2 border-amber-200 text-amber-700 font-bold rounded-xl hover:bg-amber-50 transition-colors">Cancelar</button>
+                    <button id="save-branch-btn"
+                        class="w-full sm:flex-1 py-3.5 btn-primary text-white font-bold rounded-xl shadow-md">Guardar</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="restock-modal"
+            class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 transition-opacity">
+            <div class="bg-white rounded-2xl w-full max-w-md p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+                <h3 class="text-xl sm:text-2xl font-black text-amber-900 mb-2">Recargar Stock</h3>
+                <p id="restock-current-stock"
+                    class="text-sm sm:text-base font-semibold text-amber-700 mb-6 pb-4 border-b border-amber-100"></p>
+
+                <div class="space-y-4">
+                    <input type="hidden" id="restock-branch-id">
+                    <div><label class="block text-sm font-bold text-amber-800 mb-1.5">Agregar Bultos</label> <input
+                            type="number" id="restock-bultos" min="0" value="0"
+                            class="w-full px-4 py-3 rounded-xl border-2 border-amber-200 focus:border-amber-400 outline-none transition-colors text-sm sm:text-base">
+                    </div>
+                    <div><label class="block text-sm font-bold text-amber-800 mb-1.5">Agregar Kilos</label> <input
+                            type="number" id="restock-kilos" min="0" value="0"
+                            class="w-full px-4 py-3 rounded-xl border-2 border-amber-200 focus:border-amber-400 outline-none transition-colors text-sm sm:text-base">
+                    </div>
+                </div>
+                <div class="flex flex-col-reverse sm:flex-row gap-3 mt-8">
+                    <button id="cancel-restock-modal"
+                        class="w-full sm:flex-1 py-3.5 border-2 border-amber-200 text-amber-700 font-bold rounded-xl hover:bg-amber-50 transition-colors">Cancelar</button>
+                    <button id="save-restock-btn"
+                        class="w-full sm:flex-1 py-3.5 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl transition-colors shadow-md">Recargar</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="edit-report-modal"
+            class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 transition-opacity">
+            <div class="bg-white rounded-2xl w-full max-w-4xl p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-center border-b border-amber-100 pb-4 mb-6">
+                    <h3 class="text-xl sm:text-2xl font-black text-amber-900">Editar Reporte</h3>
+                    <button onclick="closeEditReportModal()" class="text-gray-400 hover:text-red-500"><i data-lucide="x"
+                            class="w-6 h-6"></i></button>
+                </div>
+
+                <div class="space-y-6">
+                    <input type="hidden" id="edit-report-id">
+                    <input type="hidden" id="edit-initial-bultos">
+                    <input type="hidden" id="edit-initial-kilos">
+
+                    <h3 class="font-bold text-amber-800 text-lg border-b border-amber-100 pb-2">Consumo de Harina</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 border-2 border-amber-100 rounded-xl bg-gray-50/50">
+                            <h4 class="font-bold text-amber-900 mb-3">Maseca Premium</h4>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div><label class="block text-xs font-bold text-amber-600 mb-1">Bultos</label> <input
+                                        type="number" id="edit-maseca-bultos" min="0"
+                                        oninput="editCalculateFinalStock()"
+                                        class="w-full px-3 py-2 rounded-lg border-2 border-amber-200 focus:border-amber-400 outline-none font-bold text-amber-900">
+                                </div>
+                                <div><label class="block text-xs font-bold text-amber-600 mb-1">Kilos</label> <input
+                                        type="number" id="edit-maseca-kilos" min="0" oninput="editCalculateFinalStock()"
+                                        class="w-full px-3 py-2 rounded-lg border-2 border-amber-200 focus:border-amber-400 outline-none font-bold text-amber-900">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 border-2 border-amber-100 rounded-xl bg-gray-50/50">
+                            <h4 class="font-bold text-amber-900 mb-3">Harimasa Blanca</h4>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div><label class="block text-xs font-bold text-amber-600 mb-1">Bultos</label> <input
+                                        type="number" id="edit-blanca-bultos" min="0"
+                                        oninput="editCalculateFinalStock()"
+                                        class="w-full px-3 py-2 rounded-lg border-2 border-amber-200 focus:border-amber-400 outline-none font-bold text-amber-900">
+                                </div>
+                                <div><label class="block text-xs font-bold text-amber-600 mb-1">Kilos</label> <input
+                                        type="number" id="edit-blanca-kilos" min="0" oninput="editCalculateFinalStock()"
+                                        class="w-full px-3 py-2 rounded-lg border-2 border-amber-200 focus:border-amber-400 outline-none font-bold text-amber-900">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 border-2 border-amber-100 rounded-xl bg-gray-50/50">
+                            <h4 class="font-bold text-amber-900 mb-3">Harimasa Amarilla</h4>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div><label class="block text-xs font-bold text-amber-600 mb-1">Bultos</label> <input
+                                        type="number" id="edit-amarilla-bultos" min="0"
+                                        oninput="editCalculateFinalStock()"
+                                        class="w-full px-3 py-2 rounded-lg border-2 border-amber-200 focus:border-amber-400 outline-none font-bold text-amber-900">
+                                </div>
+                                <div><label class="block text-xs font-bold text-amber-600 mb-1">Kilos</label> <input
+                                        type="number" id="edit-amarilla-kilos" min="0"
+                                        oninput="editCalculateFinalStock()"
+                                        class="w-full px-3 py-2 rounded-lg border-2 border-amber-200 focus:border-amber-400 outline-none font-bold text-amber-900">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 border-2 border-amber-100 rounded-xl bg-gray-50/50">
+                            <h4 class="font-bold text-amber-900 mb-3">Harimasa Fardo</h4>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div><label class="block text-xs font-bold text-amber-600 mb-1">Bultos</label> <input
+                                        type="number" id="edit-fardo-bultos" min="0" oninput="editCalculateFinalStock()"
+                                        class="w-full px-3 py-2 rounded-lg border-2 border-amber-200 focus:border-amber-400 outline-none font-bold text-amber-900">
+                                </div>
+                                <div><label class="block text-xs font-bold text-amber-600 mb-1">Kilos</label> <input
+                                        type="number" id="edit-fardo-kilos" min="0" oninput="editCalculateFinalStock()"
+                                        class="w-full px-3 py-2 rounded-lg border-2 border-amber-200 focus:border-amber-400 outline-none font-bold text-amber-900">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="font-bold text-amber-800 text-lg mt-8 border-b border-amber-100 pb-2">Materiales</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div
+                            class="p-4 border-2 border-amber-100 rounded-xl text-center bg-gray-50/50 flex flex-col items-center justify-center">
+                            <h4 class="font-bold text-amber-900 mb-3">Papel</h4>
+                            <div class="flex justify-center gap-4">
+                                <label class="flex items-center gap-1.5 cursor-pointer"><input type="radio"
+                                        name="edit_papel" value="si" class="w-5 h-5 accent-amber-500"> <span
+                                        class="text-amber-800 font-medium text-sm">Sí</span></label>
+                                <label class="flex items-center gap-1.5 cursor-pointer"><input type="radio"
+                                        name="edit_papel" value="no" class="w-5 h-5 accent-amber-500"> <span
+                                        class="text-amber-800 font-medium text-sm">No</span></label>
+                            </div>
+                        </div>
+                        <div
+                            class="p-4 border-2 border-amber-100 rounded-xl text-center bg-gray-50/50 flex flex-col items-center justify-center">
+                            <h4 class="font-bold text-amber-900 mb-3">Teflón</h4>
+                            <div class="flex justify-center gap-4">
+                                <label class="flex items-center gap-1.5 cursor-pointer"><input type="radio"
+                                        name="edit_teflon" value="si" class="w-5 h-5 accent-amber-500"> <span
+                                        class="text-amber-800 font-medium text-sm">Sí</span></label>
+                                <label class="flex items-center gap-1.5 cursor-pointer"><input type="radio"
+                                        name="edit_teflon" value="no" class="w-5 h-5 accent-amber-500"> <span
+                                        class="text-amber-800 font-medium text-sm">No</span></label>
+                            </div>
+                        </div>
+                        <div
+                            class="p-4 border-2 border-amber-100 rounded-xl text-center bg-gray-50/50 flex flex-col items-center justify-center">
+                            <h4 class="font-bold text-amber-900 mb-3">Grafito</h4>
+                            <div class="flex justify-center gap-4">
+                                <label class="flex items-center gap-1.5 cursor-pointer"><input type="radio"
+                                        name="edit_grafito" value="si" class="w-5 h-5 accent-amber-500"> <span
+                                        class="text-amber-800 font-medium text-sm">Sí</span></label>
+                                <label class="flex items-center gap-1.5 cursor-pointer"><input type="radio"
+                                        name="edit_grafito" value="no" class="w-5 h-5 accent-amber-500"> <span
+                                        class="text-amber-800 font-medium text-sm">No</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 p-5 bg-green-50 rounded-xl border border-green-200">
+                        <h3 class="font-black text-green-800 mb-4 text-center text-lg">Existencia Final Recalculada</h3>
+                        <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto">
+                            <div class="bg-white p-3 rounded-lg shadow-sm text-center border border-green-100"><span
+                                    class="block text-xs text-green-600 uppercase font-bold mb-1">Bultos</span> <span
+                                    id="edit-final-bultos-display" class="font-black text-2xl text-green-700">0</span>
+                            </div>
+                            <div class="bg-white p-3 rounded-lg shadow-sm text-center border border-green-100"><span
+                                    class="block text-xs text-green-600 uppercase font-bold mb-1">Kilos</span> <span
+                                    id="edit-final-kilos-display" class="font-black text-2xl text-green-700">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="flex flex-col-reverse sm:flex-row gap-3 mt-8">
+                    <button onclick="closeEditReportModal()"
+                        class="w-full sm:flex-1 py-3.5 border-2 border-amber-200 text-amber-700 font-bold rounded-xl hover:bg-amber-50 transition-colors">Cancelar</button>
+                    <button id="save-edit-report-btn" onclick="window.saveEditReport()"
+                        class="w-full sm:flex-1 py-3.5 btn-primary text-white font-bold rounded-xl shadow-md">Actualizar
+                        Reporte</button>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="toast" class="hidden fixed bottom-4 right-4 sm:top-4 sm:bottom-auto w-[90%] sm:w-auto left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-auto bg-green-600 text-white px-6 py-4 rounded-xl shadow-2xl z-[100] text-center sm:text-left font-bold text-sm sm:text-base">
+            <span id="toast-message"></span>
+        </div>
+        </div> 
+     
+       <script type="module">
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+            import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+            const firebaseConfig = {
+                apiKey: "AIzaSyD3AuvJ26qSRGNnIP8LroEoCfLa1MehzqI",
+                authDomain: "reportetortilleria.firebaseapp.com",
+                projectId: "reportetortilleria",
+                storageBucket: "reportetortilleria.firebasestorage.app",
+                messagingSenderId: "147837502101",
+                appId: "1:147837502101:web:d148bf159157320bc4919c",
+                measurementId: "G-QPJ2P3VJRM"
+            };
+
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+
+            let usersList = [];
+            let branchesList = [];
+            let reportsList = [];
+
+            let currentUser = null;
+            let selectedDate = null;
+            let selectedBranchForReport = null;
+            let currentCalendarMonth = new Date();
+            let isSubmitting = false;
+
+            const dataHandler = {
+                onDataChanged() {
+                    if (currentUser) {
+                        if (currentUser.role === 'admin') {
+                            renderUsers();
+                            renderBranches();
+                            updateBranchSelects();
+                            if (selectedBranchForReport) {
+                                renderCalendar();
+                            }
+                            // 🔥 ESTA ES LA LÍNEA QUE FALTABA PARA EL TIEMPO REAL 🔥
+                            if (selectedBranchForReport && selectedDate) {
+                                showReportDetail(selectedDate);
+                            }
+                        } else if (document.getElementById('employee-panel').classList.contains('hidden') === false) {
+                            const branch = getBranches().find(b => b.branch_name === currentUser.branch_name);
+                            if (branch) {
+                                document.getElementById('initial-bultos').textContent = branch.initial_stock_bultos || 0;
+                                document.getElementById('initial-kilos').textContent = branch.initial_stock_kilos || 0;
+                                calculateFinalStock();
+                            }
+                        }
+                    }
+                }
+            };
+
+            function init() {
+                onSnapshot(collection(db, 'users'), (snapshot) => {
+                    usersList = snapshot.docs.map(doc => ({ ...doc.data(), __backendId: doc.id, type: 'user' }));
+                    dataHandler.onDataChanged();
+                });
+                onSnapshot(collection(db, 'branches'), (snapshot) => {
+                    branchesList = snapshot.docs.map(doc => ({ ...doc.data(), __backendId: doc.id, type: 'branch' }));
+                    dataHandler.onDataChanged();
+                });
+                onSnapshot(collection(db, 'reports'), (snapshot) => {
+                    reportsList = snapshot.docs.map(doc => ({ ...doc.data(), __backendId: doc.id, type: 'report' }));
+                    dataHandler.onDataChanged();
+                });
+
+                setupEventListeners();
+                updateDateDisplay();
+                lucide.createIcons();
+
+                window.editUser = editUser;
+                window.deleteUser = deleteUser;
+                window.editBranch = editBranch;
+                window.deleteBranch = deleteBranch;
+                window.openRestockModal = openRestockModal;
+                window.prevMonth = prevMonth;
+                window.nextMonth = nextMonth;
+                window.selectDate = selectDate;
+            }
+
+            function getUsers() { return usersList; }
+            function getBranches() { return branchesList; }
+            function getReports() { return reportsList; }
+
+            function showToast(message, isError = false) {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toast-message');
+      
+      // Si por alguna razón el HTML del toast no existe, no rompemos el código
+      if (!toast || !toastMessage) {
+          console.warn("Mensaje del sistema:", message);
+          return;
+      }
+      
+      toast.classList.remove('bg-green-600', 'bg-red-600');
+      toast.classList.add(isError ? 'bg-red-600' : 'bg-green-600');
+      
+      toastMessage.textContent = message;
+      toast.classList.remove('hidden');
+      
+      // Ocultar después de 3.5 segundos
+      setTimeout(() => {
+          if (toast) toast.classList.add('hidden');
+      }, 3500);
+    }
+
+            function updateDateDisplay() {
+                const today = new Date();
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                document.getElementById('report-date-display').textContent = today.toLocaleDateString('es-MX', options);
+            }
+
+            // ================= AUTENTICACIÓN =================
+            function handleLogin() {
+                const username = document.getElementById('login-username').value.trim();
+                const password = document.getElementById('login-password').value;
+                const errorEl = document.getElementById('login-error');
+
+                if (username === 'admin' && password === 'admin') {
+                    currentUser = { username: 'admin', role: 'admin', branch_name: 'Todas' };
+                    showAdminPanel();
+                    return;
+                }
+
+                const user = getUsers().find(u => u.username === username && u.password === password);
+                if (user) {
+                    currentUser = user;
+                    if (user.role === 'admin') {
+                        showAdminPanel();
+                    } else {
+                        showEmployeePanel();
+                    }
+                } else {
+                    errorEl.textContent = 'Usuario o contraseña incorrectos';
+                    errorEl.classList.remove('hidden');
+                }
+            }
+
+            function showAdminPanel() {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('admin-panel').classList.remove('hidden');
+                document.getElementById('employee-panel').classList.add('hidden');
+                document.getElementById('admin-username-display').textContent = currentUser.username;
+
+                document.body.classList.remove('bg-gradient-to-br', 'from-[#f8981d]', 'to-[#e65c00]');
+                document.body.classList.add('bg-amber-50');
+
+                renderUsers();
+                renderBranches();
+                updateBranchSelects();
+                lucide.createIcons();
+            }
+
+            function showEmployeePanel() {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('admin-panel').classList.add('hidden');
+                document.getElementById('employee-panel').classList.remove('hidden');
+
+                document.body.classList.remove('bg-gradient-to-br', 'from-[#f8981d]', 'to-[#e65c00]');
+                document.body.classList.add('bg-amber-50');
+
+                const branch = getBranches().find(b => b.branch_name === currentUser.branch_name);
+                document.getElementById('employee-branch-display').textContent = currentUser.branch_name || 'Sin sucursal';
+
+                if (branch) {
+                    document.getElementById('initial-bultos').textContent = branch.initial_stock_bultos || 0;
+                    document.getElementById('initial-kilos').textContent = branch.initial_stock_kilos || 0;
+                }
+
+                calculateFinalStock();
+                lucide.createIcons();
+            }
+
+            function logout() {
+
+                const inputs = ['maseca-bultos', 'maseca-kilos', 'harimasa-blanca-bultos', 'harimasa-blanca-kilos', 'harimasa-amarilla-bultos', 'harimasa-amarilla-kilos', 'harimasa-fardo-bultos', 'harimasa-fardo-kilos'];
+                inputs.forEach(id => { if (document.getElementById(id)) document.getElementById(id).value = ''; });
+                currentUser = null;
+                document.getElementById('login-screen').classList.remove('hidden');
+                document.getElementById('admin-panel').classList.add('hidden');
+                document.getElementById('employee-panel').classList.add('hidden');
+                document.getElementById('login-username').value = '';
+                document.getElementById('login-password').value = '';
+                document.getElementById('login-error').classList.add('hidden');
+
+                // 🔥 LIMPIAMOS LOS DATOS AL SALIR 🔥
+                if (window.limpiarFormularioEmpleado) {
+                    window.limpiarFormularioEmpleado();
+                }
+
+                closeMobileMenu();
+
+                document.body.classList.remove('bg-amber-50');
+                document.body.classList.add('bg-gradient-to-br', 'from-[#f8981d]', 'to-[#e65c00]');
+            }
+
+            // ================= MENU MÓVIL =================
+            function toggleMobileMenu() {
+                const sidebar = document.getElementById('admin-sidebar');
+                const overlay = document.getElementById('sidebar-overlay');
+                const isClosed = sidebar.classList.contains('-translate-x-full');
+
+                if (isClosed) {
+                    sidebar.classList.remove('-translate-x-full');
+                    overlay.classList.remove('hidden');
+                } else {
+                    closeMobileMenu();
+                }
+            }
+
+            function closeMobileMenu() {
+                const sidebar = document.getElementById('admin-sidebar');
+                const overlay = document.getElementById('sidebar-overlay');
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+
+            // ================= FUNCIONES ADMIN =================
+            function renderUsers() {
+                const container = document.getElementById('users-list');
+                const users = getUsers();
+
+                if (users.length === 0) {
+                    container.innerHTML = `
+          <div class="text-center py-12 text-amber-600 bg-white rounded-xl">
+            <i data-lucide="users" class="w-12 h-12 mx-auto mb-3 opacity-50"></i>
+            <p>No hay usuarios registrados</p>
+          </div>`;
+                    lucide.createIcons();
+                    return;
+                }
+
+                container.innerHTML = users.map(user => `
+        <div class="bg-white rounded-xl p-4 sm:p-5 flex flex-col md:flex-row items-start md:items-center justify-between card-shadow gap-4" data-user-id="${user.__backendId}">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 ${user.role === 'admin' ? 'bg-purple-100' : 'bg-amber-100'} rounded-full flex items-center justify-center shrink-0">
+              <i data-lucide="${user.role === 'admin' ? 'shield' : 'user'}" class="w-6 h-6 ${user.role === 'admin' ? 'text-purple-600' : 'text-amber-600'}"></i>
+            </div>
+            <div class="overflow-hidden">
+              <h4 class="font-bold text-amber-900 truncate text-lg sm:text-base">${user.username}</h4>
+              <p class="text-sm text-amber-600 truncate">${user.branch_name || 'Sin sucursal'} • ${user.role === 'admin' ? 'Administrador' : 'Empleado'}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 w-full md:w-auto">
+            <button onclick="editUser('${user.__backendId}')" class="flex-1 md:flex-none justify-center px-4 py-2.5 sm:py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold rounded-lg transition-colors flex items-center gap-2 text-sm sm:text-base">
+              <i data-lucide="edit" class="w-4 h-4"></i> Editar
+            </button>
+            <button onclick="deleteUser('${user.__backendId}')" class="flex-1 md:flex-none justify-center px-4 py-2.5 sm:py-2 bg-red-50 text-red-600 hover:bg-red-100 font-bold rounded-lg transition-colors flex items-center gap-2 text-sm sm:text-base">
+              <i data-lucide="trash-2" class="w-4 h-4"></i> Eliminar
+            </button>
+          </div>
+        </div>
+      `).join('');
+                lucide.createIcons();
+            }
+
+
+            function renderBranches() {
+                const container = document.getElementById('branches-list');
+                const branches = getBranches();
+
+                if (branches.length === 0) {
+                    container.innerHTML = `
+          <div class="text-center py-12 text-amber-600 bg-white rounded-xl">
+            <i data-lucide="store" class="w-12 h-12 mx-auto mb-3 opacity-50"></i>
+            <p>No hay sucursales registradas</p>
+          </div>`;
+                    lucide.createIcons();
+                    return;
+                }
+
+                container.innerHTML = branches.map(branch => `
+        <div class="bg-white rounded-xl p-4 sm:p-5 flex flex-col xl:flex-row items-start xl:items-center justify-between card-shadow gap-4" data-branch-id="${branch.__backendId}">
+          <div class="flex items-center gap-4 w-full xl:w-auto">
+            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center shrink-0">
+              <i data-lucide="store" class="w-6 h-6 text-green-600"></i>
+            </div>
+            <div class="overflow-hidden">
+              <h4 class="font-bold text-amber-900 truncate text-lg sm:text-base">${branch.branch_name}</h4>
+              <p class="text-sm text-amber-600 truncate">Existencia Actual: <b class="text-amber-800">${branch.initial_stock_bultos}</b> bts / <b class="text-amber-800">${branch.initial_stock_kilos}</b> kg</p>
+            </div>
+          </div>
+          
+          <div class="w-full xl:w-auto flex flex-col gap-2.5">
+            <div class="grid grid-cols-3 gap-2">
+              <button onclick="openRestockModal('${branch.__backendId}')" class="flex-1 justify-center px-2 py-2 bg-green-50 text-green-700 hover:bg-green-100 font-bold rounded-lg transition-colors flex items-center gap-1.5 text-xs sm:text-sm">
+                <i data-lucide="package-plus" class="w-4 h-4"></i> <span class="hidden sm:inline">Recargar</span>
+              </button>
+              <button onclick="editBranch('${branch.__backendId}')" class="flex-1 justify-center px-2 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold rounded-lg transition-colors flex items-center gap-1.5 text-xs sm:text-sm">
+                <i data-lucide="edit" class="w-4 h-4"></i> <span class="hidden sm:inline">Editar</span>
+              </button>
+              <button onclick="deleteBranch('${branch.__backendId}')" class="flex-1 justify-center px-2 py-2 bg-red-50 text-red-600 hover:bg-red-100 font-bold rounded-lg transition-colors flex items-center gap-1.5 text-xs sm:text-sm">
+                <i data-lucide="trash-2" class="w-4 h-4"></i> <span class="hidden sm:inline">Eliminar</span>
+              </button>
+            </div>
+            <div class="grid grid-cols-2 gap-2 border-t border-gray-100 pt-2.5">
+              <button onclick="window.descargarReporteSucursal('${branch.__backendId}', 'semanal')" class="justify-center py-2 bg-amber-100 text-amber-800 hover:bg-amber-200 font-bold rounded-lg transition-colors flex items-center gap-2 text-xs sm:text-sm shadow-sm">
+                <i data-lucide="file-text" class="w-4 h-4"></i> PDF Semanal
+              </button>
+              <button onclick="window.descargarReporteSucursal('${branch.__backendId}', 'mensual')" class="justify-center py-2 bg-amber-500 text-white hover:bg-amber-600 font-bold rounded-lg transition-colors flex items-center gap-2 text-xs sm:text-sm shadow-sm">
+                <i data-lucide="calendar-days" class="w-4 h-4"></i> PDF Mensual
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+                lucide.createIcons();
+            }
+
+            function updateBranchSelects() {
+                const branches = getBranches();
+                const options = '<option value="">-- Seleccione --</option>' +
+                    branches.map(b => `<option value="${b.branch_name}">${b.branch_name}</option>`).join('');
+                document.getElementById('modal-branch').innerHTML = options;
+                document.getElementById('report-branch-select').innerHTML = options;
+            }
+
+            // ================= FIREBASE CRUD =================
+            async function saveUser() {
+                if (isSubmitting) return;
+                const userId = document.getElementById('modal-user-id').value;
+                const username = document.getElementById('modal-username').value.trim();
+                const password = document.getElementById('modal-password').value;
+                const branch = document.getElementById('modal-branch').value;
+                const role = document.getElementById('modal-role').value;
+
+                if (!username || !password) {
+                    showToast('Complete todos los campos', true);
+                    return;
+                }
+
+                isSubmitting = true;
+                document.getElementById('save-user-btn').innerHTML = '<i class="lucide-loader animate-spin inline w-4 h-4 mr-2"></i> Guardando';
+                document.getElementById('save-user-btn').disabled = true;
+
+                try {
+                    if (userId) {
+                        const userRef = doc(db, 'users', userId);
+                        await updateDoc(userRef, { username, password, branch_name: branch, role });
+                        showToast('Usuario actualizado exitosamente');
+                    } else {
+                        await addDoc(collection(db, 'users'), { type: 'user', username, password, branch_name: branch, role });
+                        showToast('Usuario creado exitosamente');
+                    }
+                    closeUserModal();
+                } catch (error) {
+                    console.error(error);
+                    showToast('Error al guardar usuario', true);
+                } finally {
+                    isSubmitting = false;
+                    document.getElementById('save-user-btn').textContent = 'Guardar';
+                    document.getElementById('save-user-btn').disabled = false;
+                }
+            }
+
+            async function deleteUser(id) {
+                if (!confirm("¿Seguro que deseas eliminar este usuario?")) return;
+                try {
+                    await deleteDoc(doc(db, 'users', id));
+                    showToast('Usuario eliminado');
+                } catch (e) {
+                    showToast('Error al eliminar', true);
+                }
+            }
+
+            async function saveBranch() {
+                if (isSubmitting) return;
+                const branchId = document.getElementById('modal-branch-id').value;
+                const name = document.getElementById('modal-branch-name').value.trim();
+                const bultos = parseInt(document.getElementById('modal-initial-bultos').value) || 0;
+                const kilos = parseInt(document.getElementById('modal-initial-kilos').value) || 0;
+
+                if (!name) {
+                    showToast('Ingrese el nombre de la sucursal', true);
+                    return;
+                }
+
+                isSubmitting = true;
+                document.getElementById('save-branch-btn').innerHTML = '<i class="lucide-loader animate-spin inline w-4 h-4 mr-2"></i> Guardando';
+                document.getElementById('save-branch-btn').disabled = true;
+
+                try {
+                    if (branchId) {
+                        const branchRef = doc(db, 'branches', branchId);
+                        await updateDoc(branchRef, { branch_name: name, initial_stock_bultos: bultos, initial_stock_kilos: kilos });
+                        showToast('Sucursal actualizada exitosamente');
+                    } else {
+                        await addDoc(collection(db, 'branches'), {
+                            type: 'branch',
+                            branch_name: name,
+                            initial_stock_bultos: bultos,
+                            initial_stock_kilos: kilos
+                        });
+                        showToast('Sucursal creada exitosamente');
+                    }
+                    closeBranchModal();
+                } catch (error) {
+                    showToast('Error al procesar sucursal', true);
+                } finally {
+                    isSubmitting = false;
+                    document.getElementById('save-branch-btn').textContent = 'Guardar';
+                    document.getElementById('save-branch-btn').disabled = false;
+                }
+            }
+
+            async function deleteBranch(id) {
+                if (!confirm("¿Seguro que deseas eliminar esta sucursal?")) return;
+                try {
+                    await deleteDoc(doc(db, 'branches', id));
+                    showToast('Sucursal eliminada');
+                } catch (e) {
+                    showToast('Error al eliminar', true);
+                }
+            }
+
+            async function saveRestock() {
+                if (isSubmitting) return;
+
+                const branchId = document.getElementById('restock-branch-id').value;
+                const branch = getBranches().find(b => b.__backendId === branchId);
+                if (!branch) return;
+
+                const addBultos = parseInt(document.getElementById('restock-bultos').value) || 0;
+                const addKilos = parseInt(document.getElementById('restock-kilos').value) || 0;
+
+                if (addBultos === 0 && addKilos === 0) {
+                    showToast('Ingresa una cantidad para recargar', true);
+                    return;
+                }
+
+                isSubmitting = true;
+                document.getElementById('save-restock-btn').innerHTML = '<i class="lucide-loader animate-spin inline w-4 h-4 mr-2"></i> Recargando';
+                document.getElementById('save-restock-btn').disabled = true;
+
+                try {
+                    const currentTotalKilos = ((branch.initial_stock_bultos || 0) * 20) + (branch.initial_stock_kilos || 0);
+                    const addTotalKilos = (addBultos * 20) + addKilos;
+                    const newTotalKilos = currentTotalKilos + addTotalKilos;
+
+                    const newBultos = Math.floor(newTotalKilos / 20);
+                    const newKilos = newTotalKilos % 20;
+
+                    const branchRef = doc(db, 'branches', branchId);
+                    await updateDoc(branchRef, {
+                        initial_stock_bultos: newBultos,
+                        initial_stock_kilos: newKilos
+                    });
+
+                    showToast('Stock recargado correctamente');
+                    closeRestockModal();
+                } catch (error) {
+                    showToast('Error al recargar stock', true);
+                } finally {
+                    isSubmitting = false;
+                    document.getElementById('save-restock-btn').textContent = 'Recargar';
+                    document.getElementById('save-restock-btn').disabled = false;
+                }
+            }
+
+            // ================= ESCOBA VIRTUAL (LIMPIEZA DE FORMULARIO) =================
+            window.limpiarFormularioEmpleado = function () {
+                // 1. Forzar el vaciado de todas las casillas de texto
+                const casillas = [
+                    'maseca-bultos', 'maseca-kilos',
+                    'harimasa-blanca-bultos', 'harimasa-blanca-kilos',
+                    'harimasa-amarilla-bultos', 'harimasa-amarilla-kilos',
+                    'harimasa-fardo-bultos', 'harimasa-fardo-kilos'
+                ];
+
+                casillas.forEach(id => {
+                    const elemento = document.getElementById(id);
+                    if (elemento) elemento.value = ''; // Lo dejamos en blanco totalmente
+                });
+
+                // 2. Regresar los materiales a 'No'
+                ['papel', 'teflon', 'grafito'].forEach(material => {
+                    const radioNo = document.querySelector(`input[name="${material}"][value="no"]`);
+                    if (radioNo) radioNo.checked = true;
+                });
+
+                // 3. Forzar el recálculo visual para que la caja verde quede en ceros o en el stock actual
+                calculateFinalStock();
+
+                // 4. Regresar la pantalla hacia arriba
+                const scroll = document.getElementById('employee-scroll');
+                if (scroll) scroll.scrollTo({ top: 0, behavior: 'smooth' });
+            };
+
+            // ================= CALENDARIO =================
+            function renderCalendar() {
+                const container = document.getElementById('calendar-container');
+                const year = currentCalendarMonth.getFullYear();
+                const month = currentCalendarMonth.getMonth();
+                const firstDay = new Date(year, month, 1);
+                const lastDay = new Date(year, month + 1, 0);
+                const startDay = firstDay.getDay();
+
+                const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+                const dayNames = ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa'];
+
+                const reports = getReports().filter(r => r.branch_id === selectedBranchForReport || r.branch_name === selectedBranchForReport);
+                const reportDates = reports.map(r => r.report_date);
+
+                let html = `
+        <div class="flex items-center justify-between mb-4 bg-amber-50 p-2 rounded-xl">
+          <button onclick="prevMonth()" class="p-2 hover:bg-amber-200 rounded-lg transition-colors">
+            <i data-lucide="chevron-left" class="w-5 h-5 text-amber-700"></i>
+          </button>
+          <span class="font-bold text-amber-900">${monthNames[month]} ${year}</span>
+          <button onclick="nextMonth()" class="p-2 hover:bg-amber-200 rounded-lg transition-colors">
+            <i data-lucide="chevron-right" class="w-5 h-5 text-amber-700"></i>
+          </button>
+        </div>
+        <div class="overflow-x-auto pb-2">
+            <div class="min-w-[240px]">
+                <div class="grid grid-cols-7 gap-1 text-center mb-2">
+                  ${dayNames.map(d => `<div class="text-[11px] sm:text-xs font-bold text-amber-600 py-1 uppercase">${d}</div>`).join('')}
+                </div>
+                <div class="grid grid-cols-7 gap-1">
+      `;
+
+                for (let i = 0; i < startDay; i++) {
+                    html += `<div class="p-2"></div>`;
+                }
+
+                for (let day = 1; day <= lastDay.getDate(); day++) {
+                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    const hasReport = reportDates.includes(dateStr);
+                    const isSelected = selectedDate === dateStr;
+
+                    html += `
+          <button onclick="selectDate('${dateStr}')" class="calendar-day aspect-square flex items-center justify-center p-1 sm:p-2 rounded-lg text-xs sm:text-sm font-bold ${hasReport ? 'has-report shadow-sm border border-emerald-200 text-emerald-800' : 'text-amber-800 hover:bg-amber-100'} ${isSelected ? 'selected shadow-md border-transparent' : ''}">
+            ${day}
+          </button>
+        `;
+                }
+
+                html += '</div></div></div>';
+                container.innerHTML = html;
+                lucide.createIcons();
+            }
+
+            function prevMonth() { currentCalendarMonth.setMonth(currentCalendarMonth.getMonth() - 1); renderCalendar(); }
+            function nextMonth() { currentCalendarMonth.setMonth(currentCalendarMonth.getMonth() + 1); renderCalendar(); }
+            function selectDate(dateStr) { selectedDate = dateStr; renderCalendar(); showReportDetail(dateStr); }
+
+            function showReportDetail(dateStr) {
+                const container = document.getElementById('report-detail');
+                const report = getReports().find(r => r.report_date === dateStr && (r.branch_id === selectedBranchForReport || r.branch_name === selectedBranchForReport));
+
+                if (!report) {
+                    container.innerHTML = `
+          <div class="text-center text-amber-600 py-12 bg-amber-50 rounded-xl border border-dashed border-amber-200">
+            <i data-lucide="file-x" class="w-16 h-16 mx-auto mb-4 opacity-40"></i>
+            <p class="font-semibold">No hay reporte registrado para esta fecha.</p>
+          </div>`;
+                    lucide.createIcons();
+                    return;
+                }
+
+                const date = new Date(dateStr + 'T12:00:00');
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+                container.innerHTML = `
+        <div class="space-y-6">
+          <div class="border-b border-amber-100 pb-4">
+            <h3 class="text-lg sm:text-xl font-black text-amber-900 capitalize">${date.toLocaleDateString('es-MX', options)}</h3>
+            <p class="text-sm text-amber-600 mt-1">Enviado por: <span class="font-bold text-amber-800">${report.submitted_by}</span></p>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-3 sm:gap-4">
+            <div class="p-3 bg-amber-50 rounded-xl border border-amber-100">
+              <p class="text-xs text-amber-600 uppercase font-bold mb-1">Existencia Inicial</p>
+              <p class="font-black text-amber-900 text-sm sm:text-base">${report.initial_stock_bultos || 0} bts / ${report.initial_stock_kilos || 0} kg</p>
+            </div>
+            <div class="p-3 bg-green-50 rounded-xl border border-green-100">
+              <p class="text-xs text-green-600 uppercase font-bold mb-1">Existencia Final</p>
+              <p class="font-black text-green-900 text-sm sm:text-base">${report.existencia_final_bultos || 0} bts / ${report.existencia_final_kilos || 0} kg</p>
+            </div>
+          </div>
+
+          <div class="bg-gray-50 rounded-xl p-4 sm:p-5 border border-gray-100">
+            <h4 class="font-bold text-amber-900 mb-4 border-b border-gray-200 pb-2">Desglose de Consumo</h4>
+            <div class="space-y-2.5 text-sm">
+              <div class="flex flex-col sm:flex-row justify-between sm:items-center p-2.5 bg-white rounded-lg shadow-sm border border-gray-50">
+                <span class="font-semibold text-slate-700 mb-1 sm:mb-0">Maseca Premium</span>
+                <span class="font-bold text-amber-700">${report.maseca_premium_bultos || 0} bts / ${report.maseca_premium_kilos || 0} kg</span>
+              </div>
+              <div class="flex flex-col sm:flex-row justify-between sm:items-center p-2.5 bg-white rounded-lg shadow-sm border border-gray-50">
+                <span class="font-semibold text-slate-700 mb-1 sm:mb-0">Harimasa Blanca</span>
+                <span class="font-bold text-amber-700">${report.harimasa_blanca_bultos || 0} bts / ${report.harimasa_blanca_kilos || 0} kg</span>
+              </div>
+              <div class="flex flex-col sm:flex-row justify-between sm:items-center p-2.5 bg-white rounded-lg shadow-sm border border-gray-50">
+                <span class="font-semibold text-slate-700 mb-1 sm:mb-0">Harimasa Amarilla</span>
+                <span class="font-bold text-amber-700">${report.harimasa_amarilla_bultos || 0} bts / ${report.harimasa_amarilla_kilos || 0} kg</span>
+              </div>
+              <div class="flex flex-col sm:flex-row justify-between sm:items-center p-2.5 bg-white rounded-lg shadow-sm border border-gray-50">
+                <span class="font-semibold text-slate-700 mb-1 sm:mb-0">Harimasa Fardo</span>
+                <span class="font-bold text-amber-700">${report.harimasa_fardo_bultos || 0} bts / ${report.harimasa_fardo_kilos || 0} kg</span>
+              </div>
+            </div>
+          </div>
+          
+          <div>
+            <h4 class="font-bold text-amber-900 mb-3 text-sm">Materiales Solicitados</h4>
+            <div class="flex flex-wrap gap-2 text-xs font-bold">
+              <div class="px-3 py-1.5 rounded-full ${report.tiene_papel ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-gray-100 text-gray-500'}">
+                Papel: ${report.tiene_papel ? 'SÍ' : 'NO'}
+              </div>
+              <div class="px-3 py-1.5 rounded-full ${report.tiene_teflon ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-gray-100 text-gray-500'}">
+                Teflón: ${report.tiene_teflon ? 'SÍ' : 'NO'}
+              </div>
+              <div class="px-3 py-1.5 rounded-full ${report.tiene_grafito ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-gray-100 text-gray-500'}">
+                Grafito: ${report.tiene_grafito ? 'SÍ' : 'NO'}
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 flex flex-col sm:flex-row gap-3 border-t border-amber-100 pt-5">
+            <button onclick="editReport('${report.__backendId}')" class="flex-1 py-2.5 bg-blue-50 text-blue-600 font-bold rounded-xl hover:bg-blue-100 transition-colors flex items-center justify-center gap-2 shadow-sm">
+              <i data-lucide="edit" class="w-4 h-4"></i> Editar
+            </button>
+            <button onclick="deleteReport('${report.__backendId}')" class="flex-1 py-2.5 bg-red-50 text-red-600 font-bold rounded-xl hover:bg-red-100 transition-colors flex items-center justify-center gap-2 shadow-sm">
+              <i data-lucide="trash-2" class="w-4 h-4"></i> Eliminar
+            </button>
+            <button onclick="generarPDF()" class="flex-1 py-2.5 bg-amber-600 text-white font-bold rounded-xl hover:bg-amber-700 transition-colors flex items-center justify-center gap-2 shadow-sm">
+              <i data-lucide="download" class="w-4 h-4"></i> Descargar PDF
+            </button>
+          </div>
+
+        </div>
+      `;
+                lucide.createIcons();
+            }
+            // ================= FUNCIONES EMPLEADO =================
+            function calculateFinalStock() {
+                const branch = getBranches().find(b => b.branch_name === currentUser?.branch_name);
+                if (!branch) return;
+
+                const initialBultos = branch.initial_stock_bultos || 0;
+                const initialKilos = branch.initial_stock_kilos || 0;
+
+                const consumedBultos =
+                    (parseInt(document.getElementById('maseca-bultos')?.value) || 0) +
+                    (parseInt(document.getElementById('harimasa-blanca-bultos')?.value) || 0) +
+                    (parseInt(document.getElementById('harimasa-amarilla-bultos')?.value) || 0) +
+                    (parseInt(document.getElementById('harimasa-fardo-bultos')?.value) || 0);
+
+                const consumedKilos =
+                    (parseInt(document.getElementById('maseca-kilos')?.value) || 0) +
+                    (parseInt(document.getElementById('harimasa-blanca-kilos')?.value) || 0) +
+                    (parseInt(document.getElementById('harimasa-amarilla-kilos')?.value) || 0) +
+                    (parseInt(document.getElementById('harimasa-fardo-kilos')?.value) || 0);
+
+                const totalConsumedKilos = (consumedBultos * 20) + consumedKilos;
+                const totalInitialKilos = (initialBultos * 20) + initialKilos;
+
+                const finalKilos = totalInitialKilos - totalConsumedKilos;
+                const finalBultos = Math.floor(finalKilos / 20);
+                const remainingKilos = finalKilos % 20;
+
+                const displayBultos = finalKilos < 0 ? 0 : finalBultos;
+                const displayKilos = finalKilos < 0 ? 0 : remainingKilos;
+
+                document.getElementById('final-bultos').textContent = displayBultos;
+                document.getElementById('final-kilos').textContent = displayKilos;
+
+                const finalContainer = document.getElementById('final-bultos').parentElement.parentElement;
+                if (finalKilos < 0) {
+                    finalContainer.classList.add('border-red-500');
+                    showToast('Advertencia: El consumo es mayor a la existencia', true);
+                } else {
+                    finalContainer.classList.remove('border-red-500');
+                }
+            }
+
+           // ================= ENVÍO DE REPORTE (EMPLEADO) =================
     window.submitReport = async function() {
         // 1. Destrabar el botón a la fuerza por si se quedó congelado antes
         isSubmitting = false; 
@@ -120,3 +1461,602 @@
             }
         }
     };
+            // ================= MODALS UI =================
+            function openUserModal() {
+                document.getElementById('user-modal').classList.remove('hidden');
+                document.getElementById('modal-user-id').value = '';
+                document.getElementById('user-modal-title').textContent = 'Nuevo Usuario';
+                document.getElementById('modal-username').value = '';
+                document.getElementById('modal-password').value = '';
+                document.getElementById('modal-branch').value = '';
+                document.getElementById('modal-role').value = 'empleado';
+            }
+
+            function editUser(userId) {
+                const user = getUsers().find(d => d.__backendId === userId);
+                if (!user) { showToast('Usuario no encontrado', true); return; }
+                document.getElementById('user-modal').classList.remove('hidden');
+                document.getElementById('user-modal-title').textContent = 'Editar Usuario';
+                document.getElementById('modal-user-id').value = userId;
+                document.getElementById('modal-username').value = user.username || '';
+                document.getElementById('modal-password').value = user.password || '';
+                document.getElementById('modal-branch').value = user.branch_name || '';
+                document.getElementById('modal-role').value = user.role || 'empleado';
+            }
+            function closeUserModal() { document.getElementById('user-modal').classList.add('hidden'); }
+
+            function openBranchModal() {
+                document.getElementById('branch-modal').classList.remove('hidden');
+                document.getElementById('branch-modal-title').textContent = 'Nueva Sucursal';
+                document.getElementById('modal-branch-id').value = '';
+                document.getElementById('modal-branch-name').value = '';
+                document.getElementById('modal-initial-bultos').value = 0;
+                document.getElementById('modal-initial-kilos').value = 0;
+            }
+
+            function editBranch(branchId) {
+                const branch = getBranches().find(b => b.__backendId === branchId);
+                if (!branch) { showToast('Sucursal no encontrada', true); return; }
+                document.getElementById('branch-modal').classList.remove('hidden');
+                document.getElementById('branch-modal-title').textContent = 'Editar Sucursal';
+                document.getElementById('modal-branch-id').value = branchId;
+                document.getElementById('modal-branch-name').value = branch.branch_name || '';
+                document.getElementById('modal-initial-bultos').value = branch.initial_stock_bultos || 0;
+                document.getElementById('modal-initial-kilos').value = branch.initial_stock_kilos || 0;
+            }
+            function closeBranchModal() { document.getElementById('branch-modal').classList.add('hidden'); }
+
+            function openRestockModal(branchId) {
+                const branch = getBranches().find(b => b.__backendId === branchId);
+                if (!branch) return;
+                document.getElementById('restock-modal').classList.remove('hidden');
+                document.getElementById('restock-branch-id').value = branchId;
+                document.getElementById('restock-current-stock').innerHTML = `El stock actual es de: <b>${branch.initial_stock_bultos || 0} bultos y ${branch.initial_stock_kilos || 0} kg</b>. ¿Cuánto deseas agregar?`;
+                document.getElementById('restock-bultos').value = 0;
+                document.getElementById('restock-kilos').value = 0;
+            }
+            function closeRestockModal() { document.getElementById('restock-modal').classList.add('hidden'); }
+
+            // ================= PANTALLA DE CARGA =================
+            function hideLoadingScreen() {
+                const loader = document.getElementById('loading-screen');
+                const app = document.getElementById('app');
+
+                app.classList.remove('hidden');
+                loader.classList.add('opacity-0');
+
+                setTimeout(() => {
+                    loader.classList.add('hidden');
+                }, 700);
+            }
+
+            // ================= EVENT LISTENERS =================
+            function setupEventListeners() {
+                document.getElementById('login-btn').addEventListener('click', handleLogin);
+                document.getElementById('login-password').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') handleLogin();
+                });
+
+                document.getElementById('admin-logout').addEventListener('click', logout);
+                document.getElementById('employee-logout').addEventListener('click', logout);
+
+                document.getElementById('mobile-menu-btn').addEventListener('click', toggleMobileMenu);
+                document.getElementById('close-menu-btn').addEventListener('click', closeMobileMenu);
+                document.getElementById('sidebar-overlay').addEventListener('click', closeMobileMenu);
+
+                document.querySelectorAll('[data-section]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('[data-section]').forEach(b => b.classList.remove('active', 'bg-amber-100'));
+                        btn.classList.add('active', 'bg-amber-100');
+                        const section = btn.dataset.section;
+                        document.getElementById('section-users').classList.toggle('hidden', section !== 'users');
+                        document.getElementById('section-branches').classList.toggle('hidden', section !== 'branches');
+                        document.getElementById('section-reports').classList.toggle('hidden', section !== 'reports');
+
+                        if (window.innerWidth < 768) closeMobileMenu();
+                    });
+                });
+
+                document.getElementById('add-user-btn').addEventListener('click', openUserModal);
+                document.getElementById('cancel-user-modal').addEventListener('click', closeUserModal);
+                document.getElementById('save-user-btn').addEventListener('click', saveUser);
+
+                document.getElementById('add-branch-btn').addEventListener('click', openBranchModal);
+                document.getElementById('cancel-branch-modal').addEventListener('click', closeBranchModal);
+                document.getElementById('save-branch-btn').addEventListener('click', saveBranch);
+
+                document.getElementById('cancel-restock-modal').addEventListener('click', closeRestockModal);
+                document.getElementById('save-restock-btn').addEventListener('click', saveRestock);
+
+                document.getElementById('report-branch-select').addEventListener('change', (e) => {
+                    selectedBranchForReport = e.target.value;
+
+                    // 🔥 CORRECCIÓN: Limpiamos la fecha y el detalle al cambiar de sucursal
+                    selectedDate = null;
+
+                    if (selectedBranchForReport) {
+                        renderCalendar();
+                        // Vaciamos el cuadro del reporte para que no se quede el anterior
+                        document.getElementById('report-detail').innerHTML = `
+            <div class="text-center text-amber-600 py-12">
+              <i data-lucide="calendar" class="w-16 h-16 mx-auto mb-4 opacity-50"></i>
+              <p>Seleccione una fecha para ver el reporte de esta sucursal</p>
+            </div>`;
+                        lucide.createIcons();
+                    } else {
+                        // Si selecciona el valor vacío ("-- Seleccione --")
+                        document.getElementById('calendar-container').innerHTML = '';
+                        document.getElementById('report-detail').innerHTML = `
+            <div class="text-center text-amber-600 py-12">
+              <i data-lucide="calendar" class="w-16 h-16 mx-auto mb-4 opacity-50"></i>
+              <p>Seleccione una sucursal y fecha para ver el reporte</p>
+            </div>`;
+                        lucide.createIcons();
+                    }
+                });
+            }
+
+            // ================= CRUD REPORTES (ADMIN) =================
+            async function deleteReport(id) {
+                if (!confirm("¿Estás seguro de que deseas eliminar este reporte? Esto devolverá la harina consumida al stock de la sucursal y borrará el registro de forma permanente.")) return;
+
+                try {
+                    // 1. Buscamos los datos del reporte ANTES de eliminarlo
+                    const report = getReports().find(r => r.__backendId === id);
+                    if (!report) {
+                        showToast('Error: Reporte no encontrado', true);
+                        return;
+                    }
+
+                    // 2. Calculamos el total de kilos que se consumieron en ese reporte
+                    const consumedBultos =
+                        (report.maseca_premium_bultos || 0) +
+                        (report.harimasa_blanca_bultos || 0) +
+                        (report.harimasa_amarilla_bultos || 0) +
+                        (report.harimasa_fardo_bultos || 0);
+
+                    const consumedKilos =
+                        (report.maseca_premium_kilos || 0) +
+                        (report.harimasa_blanca_kilos || 0) +
+                        (report.harimasa_amarilla_kilos || 0) +
+                        (report.harimasa_fardo_kilos || 0);
+
+                    const totalConsumedKilos = (consumedBultos * 20) + consumedKilos;
+
+                    // 3. Buscamos la sucursal a la que le pertenece el reporte
+                    const branch = getBranches().find(b => b.branch_name === report.branch_name);
+
+                    // 4. Si encontramos la sucursal y hubo consumo, le regresamos el stock
+                    if (branch && totalConsumedKilos > 0) {
+                        const currentBranchKilos = ((branch.initial_stock_bultos || 0) * 20) + (branch.initial_stock_kilos || 0);
+                        const newTotalKilos = currentBranchKilos + totalConsumedKilos;
+
+                        const newBultos = Math.floor(newTotalKilos / 20);
+                        const newKilos = newTotalKilos % 20;
+
+                        const branchRef = doc(db, 'branches', branch.__backendId);
+                        await updateDoc(branchRef, {
+                            initial_stock_bultos: newBultos,
+                            initial_stock_kilos: newKilos
+                        });
+                    }
+
+                    // 5. Ahora sí, eliminamos el reporte de Firebase
+                    await deleteDoc(doc(db, 'reports', id));
+
+                    showToast('Reporte eliminado y stock restaurado');
+                    selectedDate = null;
+                    renderCalendar();
+
+                    document.getElementById('report-detail').innerHTML = `
+          <div class="text-center text-amber-600 py-12">
+            <i data-lucide="check-circle" class="w-16 h-16 mx-auto mb-4 opacity-50 text-green-500"></i>
+            <p>Reporte eliminado y stock devuelto a la sucursal exitosamente.</p>
+          </div>`;
+                    lucide.createIcons();
+                } catch (e) {
+                    showToast('Error al procesar la eliminación', true);
+                    console.error(e);
+                }
+            }
+
+            // ================= FUNCIONES DE EDICIÓN DE REPORTE =================
+
+            // Función que calcula en vivo el stock final al editar
+            function editCalculateFinalStock() {
+                const initialBultos = parseInt(document.getElementById('edit-initial-bultos').value) || 0;
+                const initialKilos = parseInt(document.getElementById('edit-initial-kilos').value) || 0;
+
+                const consumedBultos =
+                    (parseInt(document.getElementById('edit-maseca-bultos').value) || 0) +
+                    (parseInt(document.getElementById('edit-blanca-bultos').value) || 0) +
+                    (parseInt(document.getElementById('edit-amarilla-bultos').value) || 0) +
+                    (parseInt(document.getElementById('edit-fardo-bultos').value) || 0);
+
+                const consumedKilos =
+                    (parseInt(document.getElementById('edit-maseca-kilos').value) || 0) +
+                    (parseInt(document.getElementById('edit-blanca-kilos').value) || 0) +
+                    (parseInt(document.getElementById('edit-amarilla-kilos').value) || 0) +
+                    (parseInt(document.getElementById('edit-fardo-kilos').value) || 0);
+
+                const totalConsumedKilos = (consumedBultos * 20) + consumedKilos;
+                const totalInitialKilos = (initialBultos * 20) + initialKilos;
+
+                const finalKilos = totalInitialKilos - totalConsumedKilos;
+                const finalBultos = Math.floor(finalKilos / 20);
+                const remainingKilos = finalKilos % 20;
+
+                const displayBultos = finalKilos < 0 ? 0 : finalBultos;
+                const displayKilos = finalKilos < 0 ? 0 : remainingKilos;
+
+                document.getElementById('edit-final-bultos-display').textContent = displayBultos;
+                document.getElementById('edit-final-kilos-display').textContent = displayKilos;
+            }
+
+            // ================= FUNCIONES DE EDICIÓN DE REPORTE =================
+
+            window.editCalculateFinalStock = function () {
+                const initialBultos = parseInt(document.getElementById('edit-initial-bultos').value) || 0;
+                const initialKilos = parseInt(document.getElementById('edit-initial-kilos').value) || 0;
+
+                const consumedBultos =
+                    (parseInt(document.getElementById('edit-maseca-bultos').value) || 0) +
+                    (parseInt(document.getElementById('edit-blanca-bultos').value) || 0) +
+                    (parseInt(document.getElementById('edit-amarilla-bultos').value) || 0) +
+                    (parseInt(document.getElementById('edit-fardo-bultos').value) || 0);
+
+                const consumedKilos =
+                    (parseInt(document.getElementById('edit-maseca-kilos').value) || 0) +
+                    (parseInt(document.getElementById('edit-blanca-kilos').value) || 0) +
+                    (parseInt(document.getElementById('edit-amarilla-kilos').value) || 0) +
+                    (parseInt(document.getElementById('edit-fardo-kilos').value) || 0);
+
+                const totalConsumedKilos = (consumedBultos * 20) + consumedKilos;
+                const totalInitialKilos = (initialBultos * 20) + initialKilos;
+
+                const finalKilos = totalInitialKilos - totalConsumedKilos;
+                const finalBultos = Math.floor(finalKilos / 20);
+                const remainingKilos = finalKilos % 20;
+
+                document.getElementById('edit-final-bultos-display').textContent = finalKilos < 0 ? 0 : finalBultos;
+                document.getElementById('edit-final-kilos-display').textContent = finalKilos < 0 ? 0 : remainingKilos;
+            };
+
+            window.editReport = function (id) {
+                const report = getReports().find(r => r.__backendId === id);
+                if (!report) return;
+
+                document.getElementById('edit-report-id').value = id;
+                document.getElementById('edit-initial-bultos').value = report.initial_stock_bultos || 0;
+                document.getElementById('edit-initial-kilos').value = report.initial_stock_kilos || 0;
+
+                document.getElementById('edit-maseca-bultos').value = report.maseca_premium_bultos || 0;
+                document.getElementById('edit-maseca-kilos').value = report.maseca_premium_kilos || 0;
+                document.getElementById('edit-blanca-bultos').value = report.harimasa_blanca_bultos || 0;
+                document.getElementById('edit-blanca-kilos').value = report.harimasa_blanca_kilos || 0;
+                document.getElementById('edit-amarilla-bultos').value = report.harimasa_amarilla_bultos || 0;
+                document.getElementById('edit-amarilla-kilos').value = report.harimasa_amarilla_kilos || 0;
+                document.getElementById('edit-fardo-bultos').value = report.harimasa_fardo_bultos || 0;
+                document.getElementById('edit-fardo-kilos').value = report.harimasa_fardo_kilos || 0;
+
+                const papelVal = report.tiene_papel ? 'si' : 'no';
+                const teflonVal = report.tiene_teflon ? 'si' : 'no';
+                const grafitoVal = report.tiene_grafito ? 'si' : 'no';
+
+                const papelInput = document.querySelector(`input[name="edit_papel"][value="${papelVal}"]`);
+                if (papelInput) papelInput.checked = true;
+
+                const teflonInput = document.querySelector(`input[name="edit_teflon"][value="${teflonVal}"]`);
+                if (teflonInput) teflonInput.checked = true;
+
+                const grafitoInput = document.querySelector(`input[name="edit_grafito"][value="${grafitoVal}"]`);
+                if (grafitoInput) grafitoInput.checked = true;
+
+                window.editCalculateFinalStock();
+                document.getElementById('edit-report-modal').classList.remove('hidden');
+            };
+
+            window.closeEditReportModal = function () {
+                document.getElementById('edit-report-modal').classList.add('hidden');
+            };
+
+            window.saveEditReport = async function () {
+                const id = document.getElementById('edit-report-id').value;
+                if (!id) return;
+
+                const btn = document.getElementById('save-edit-report-btn');
+                btn.innerHTML = '<i class="lucide-loader animate-spin inline w-4 h-4 mr-2"></i> Actualizando...';
+                btn.disabled = true;
+
+                try {
+                    const reportRef = doc(db, 'reports', id);
+
+                    await updateDoc(reportRef, {
+                        maseca_premium_bultos: parseInt(document.getElementById('edit-maseca-bultos').value) || 0,
+                        maseca_premium_kilos: parseInt(document.getElementById('edit-maseca-kilos').value) || 0,
+                        harimasa_blanca_bultos: parseInt(document.getElementById('edit-blanca-bultos').value) || 0,
+                        harimasa_blanca_kilos: parseInt(document.getElementById('edit-blanca-kilos').value) || 0,
+                        harimasa_amarilla_bultos: parseInt(document.getElementById('edit-amarilla-bultos').value) || 0,
+                        harimasa_amarilla_kilos: parseInt(document.getElementById('edit-amarilla-kilos').value) || 0,
+                        harimasa_fardo_bultos: parseInt(document.getElementById('edit-fardo-bultos').value) || 0,
+                        harimasa_fardo_kilos: parseInt(document.getElementById('edit-fardo-kilos').value) || 0,
+                        tiene_papel: document.querySelector('input[name="edit_papel"]:checked')?.value === 'si',
+                        tiene_teflon: document.querySelector('input[name="edit_teflon"]:checked')?.value === 'si',
+                        tiene_grafito: document.querySelector('input[name="edit_grafito"]:checked')?.value === 'si',
+                        existencia_final_bultos: parseInt(document.getElementById('edit-final-bultos-display').textContent) || 0,
+                        existencia_final_kilos: parseInt(document.getElementById('edit-final-kilos-display').textContent) || 0
+                    });
+
+                    showToast('Reporte actualizado exitosamente');
+                    window.closeEditReportModal();
+
+                    // ¡Listo! Ya no hay setTimeout aquí. El onDataChanged se encarga de actualizar la vista de forma nativa.
+
+                } catch (error) {
+                    console.error("Error capturado de Firebase: ", error);
+                    showToast('Error al conectar con la base de datos', true);
+                } finally {
+                    btn.innerHTML = 'Actualizar Reporte';
+                    btn.disabled = false;
+                }
+            };
+
+            // ... aquí termina tu función window.saveEditReport ...
+
+            // 👇 PEGA AQUÍ LA FUNCIÓN DEL PDF 👇
+            // ... (al final de tus funciones normales)
+
+            // 👇 PEGA AQUÍ LA FUNCIÓN DEL PDF
+            window.generarPDF = async function () {
+                const { jsPDF } = window.jspdf;
+                const reportElement = document.getElementById('report-detail');
+
+                // Creamos copia temporal
+                const tempContainer = document.createElement('div');
+                tempContainer.innerHTML = reportElement.innerHTML;
+                tempContainer.style.padding = "20px";
+                tempContainer.style.background = "white";
+                tempContainer.style.width = "800px";
+
+                // Ocultamos botones para que no salgan en el PDF
+                const botonesAccion = tempContainer.querySelector('.mt-6');
+                if (botonesAccion) botonesAccion.style.display = 'none';
+
+                // Espacio de firma
+                const firmaEspacio = document.createElement('div');
+                firmaEspacio.style.marginTop = "60px";
+                firmaEspacio.style.textAlign = "center";
+                firmaEspacio.innerHTML = `
+            <div style="border-top: 1px solid black; width: 250px; margin: 0 auto;"></div>
+            <p style="font-weight: bold; margin-top: 10px; font-family: sans-serif;">Firma del Encargado de Sucursal</p>
+        `;
+                tempContainer.appendChild(firmaEspacio);
+                document.body.appendChild(tempContainer);
+
+                const canvas = await html2canvas(tempContainer, { scale: 2 });
+                const imgData = canvas.toDataURL('image/png');
+
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgProps = pdf.getImageProperties(imgData);
+                const pdfWidth = pdf.internal.pageSize.getWidth() - 20;
+                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+                pdf.addImage(imgData, 'PNG', 10, 10, pdfWidth, pdfHeight);
+                pdf.save(`Reporte_${selectedDate}.pdf`);
+
+                document.body.removeChild(tempContainer);
+            };
+
+
+            // ================= DESCARGA PDF DE REPORTE INDIVIDUAL (NATIVO) =================
+    window.generarPDF = function() {
+        try {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+
+            // Buscar datos del reporte seleccionado
+            const report = getReports().find(r => r.report_date === selectedDate && (r.branch_id === selectedBranchForReport || r.branch_name === selectedBranchForReport));
+            if(!report) {
+                showToast("No hay reporte seleccionado para descargar", true);
+                return;
+            }
+
+            // Título principal
+            pdf.setFontSize(22);
+            pdf.setTextColor(217, 119, 6); // Naranja Xavi
+            pdf.text("XAVI", 105, 20, { align: "center" });
+
+            pdf.setFontSize(16);
+            pdf.setTextColor(0, 0, 0);
+            pdf.text("Reporte Diario de Consumo", 105, 30, { align: "center" });
+
+            // Información general
+            pdf.setFontSize(12);
+            pdf.text(`Sucursal: ${report.branch_name}`, 20, 45);
+            pdf.text(`Fecha: ${report.report_date}`, 20, 52);
+            pdf.text(`Enviado por: ${report.submitted_by}`, 20, 59);
+
+            // Sección: Inventario
+            pdf.setFontSize(14);
+            pdf.setTextColor(217, 119, 6);
+            pdf.text("Estado de Inventario", 20, 75);
+            pdf.setFontSize(12);
+            pdf.setTextColor(0, 0, 0);
+            pdf.text(`Existencia Inicial: ${report.initial_stock_bultos} bts / ${report.initial_stock_kilos} kg`, 25, 83);
+            pdf.text(`Existencia Final: ${report.existencia_final_bultos} bts / ${report.existencia_final_kilos} kg`, 25, 90);
+
+            // Sección: Consumo
+            pdf.setFontSize(14);
+            pdf.setTextColor(217, 119, 6);
+            pdf.text("Desglose de Consumo", 20, 105);
+            pdf.setFontSize(12);
+            pdf.setTextColor(0, 0, 0);
+            pdf.text(`- Maseca Premium: ${report.maseca_premium_bultos} bts / ${report.maseca_premium_kilos} kg`, 25, 113);
+            pdf.text(`- Harimasa Blanca: ${report.harimasa_blanca_bultos} bts / ${report.harimasa_blanca_kilos} kg`, 25, 120);
+            pdf.text(`- Harimasa Amarilla: ${report.harimasa_amarilla_bultos} bts / ${report.harimasa_amarilla_kilos} kg`, 25, 127);
+            pdf.text(`- Harimasa Fardo: ${report.harimasa_fardo_bultos} bts / ${report.harimasa_fardo_kilos} kg`, 25, 134);
+
+            // Sección: Materiales
+            pdf.setFontSize(14);
+            pdf.setTextColor(217, 119, 6);
+            pdf.text("Materiales Solicitados", 20, 150);
+            pdf.setFontSize(12);
+            pdf.setTextColor(0, 0, 0);
+            pdf.text(`Papel: ${report.tiene_papel ? 'SÍ' : 'NO'}`, 25, 158);
+            pdf.text(`Teflón: ${report.tiene_teflon ? 'SÍ' : 'NO'}`, 25, 165);
+            pdf.text(`Grafito: ${report.tiene_grafito ? 'SÍ' : 'NO'}`, 25, 172);
+
+            // Línea de Firma (Siempre al fondo)
+            pdf.setLineWidth(0.5);
+            pdf.line(65, 230, 145, 230);
+            pdf.setFontSize(12);
+            pdf.text("Firma del Encargado de Sucursal", 105, 238, { align: "center" });
+
+            // Descargar
+            pdf.save(`Reporte_${report.report_date}.pdf`);
+
+        } catch(e) {
+            alert("Error crítico: " + e.message);
+        }
+    };
+
+    // ================= DESCARGA PDF DE SUCURSALES BLINDADA (NATIVO) =================
+    window.descargarReporteSucursal = function(branchId, tipo) {
+        try {
+            const branch = getBranches().find(b => b.__backendId === branchId);
+            if (!branch) return;
+
+            const hoy = new Date();
+            let fechaInicio = new Date();
+            let tituloStr = "";
+
+            if (tipo === 'semanal') {
+                fechaInicio.setDate(hoy.getDate() - 7);
+                tituloStr = "Resumen de Consumo Semanal";
+            } else {
+                fechaInicio.setDate(hoy.getDate() - 30);
+                tituloStr = "Resumen de Consumo Mensual";
+            }
+
+            const reportesSucursal = getReports().filter(r => {
+                if (r.branch_id !== branch.branch_name && r.branch_name !== branch.branch_name) return false;
+                const rDate = new Date(r.report_date + 'T12:00:00');
+                return rDate >= fechaInicio && rDate <= hoy;
+            });
+
+            if (reportesSucursal.length === 0) {
+                showToast(`No hay reportes capturados en los últimos ${tipo === 'semanal' ? '7' : '30'} días.`, true);
+                return;
+            }
+
+            showToast("Generando PDF...");
+
+            // Cálculos
+            let totMaseca = 0, totBlanca = 0, totAmarilla = 0, totFardo = 0;
+            reportesSucursal.forEach(r => {
+                totMaseca += (parseInt(r.maseca_premium_bultos) || 0) * 20 + (parseInt(r.maseca_premium_kilos) || 0);
+                totBlanca += (parseInt(r.harimasa_blanca_bultos) || 0) * 20 + (parseInt(r.harimasa_blanca_kilos) || 0);
+                totAmarilla += (parseInt(r.harimasa_amarilla_bultos) || 0) * 20 + (parseInt(r.harimasa_amarilla_kilos) || 0);
+                totFardo += (parseInt(r.harimasa_fardo_bultos) || 0) * 20 + (parseInt(r.harimasa_fardo_kilos) || 0);
+            });
+
+            const totalGlobalKilos = totMaseca + totBlanca + totAmarilla + totFardo;
+            const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+            const fechaFinStr = hoy.toLocaleDateString('es-MX', options);
+            const fechaIniStr = fechaInicio.toLocaleDateString('es-MX', options);
+
+            // Generar Documento
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+
+            // Título
+            pdf.setFontSize(24);
+            pdf.setTextColor(217, 119, 6);
+            pdf.text("XAVI", 105, 20, { align: "center" });
+
+            pdf.setFontSize(16);
+            pdf.setTextColor(0, 0, 0);
+            pdf.text(tituloStr, 105, 30, { align: "center" });
+
+            pdf.setFontSize(12);
+            pdf.text(`Sucursal: ${branch.branch_name}`, 20, 45);
+            pdf.text(`Periodo: ${fechaIniStr} al ${fechaFinStr}`, 20, 52);
+
+            // Tabla de Totales
+            pdf.setFontSize(14);
+            pdf.setTextColor(217, 119, 6);
+            pdf.text("Desglose de Consumo Total", 20, 70);
+
+            pdf.setTextColor(0, 0, 0);
+            pdf.setFontSize(12);
+            
+            const linea = (y) => pdf.line(20, y, 190, y);
+            
+            linea(75);
+            pdf.text("Tipo de Harina", 25, 82);
+            pdf.text("Total Consumido", 130, 82);
+            linea(86);
+
+            pdf.text("Maseca Premium", 25, 95);
+            pdf.text(`${Math.floor(totMaseca/20)} bts / ${totMaseca%20} kg`, 130, 95);
+            linea(100);
+
+            pdf.text("Harimasa Blanca", 25, 108);
+            pdf.text(`${Math.floor(totBlanca/20)} bts / ${totBlanca%20} kg`, 130, 108);
+            linea(113);
+
+            pdf.text("Harimasa Amarilla", 25, 121);
+            pdf.text(`${Math.floor(totAmarilla/20)} bts / ${totAmarilla%20} kg`, 130, 121);
+            linea(126);
+
+            pdf.text("Harimasa Fardo", 25, 134);
+            pdf.text(`${Math.floor(totFardo/20)} bts / ${totFardo%20} kg`, 130, 134);
+            linea(139);
+
+            // Suma global destacada
+            pdf.setFont(undefined, 'bold');
+            pdf.text("SUMA GLOBAL", 25, 148);
+            pdf.text(`${Math.floor(totalGlobalKilos/20)} bultos / ${totalGlobalKilos%20} kilos`, 130, 148);
+            pdf.setFont(undefined, 'normal');
+            linea(153);
+
+            // Inventario actual
+            pdf.setFontSize(14);
+            pdf.setTextColor(21, 128, 61); // Verde oscuro
+            pdf.text("Estado Actual del Inventario", 20, 175);
+            pdf.setFontSize(12);
+            pdf.setTextColor(0, 0, 0);
+            pdf.text(`Existencia reportada al sistema: ${branch.initial_stock_bultos || 0} bts / ${branch.initial_stock_kilos || 0} kg`, 25, 183);
+
+            // Firma
+            pdf.setLineWidth(0.5);
+            pdf.line(65, 230, 145, 230);
+            pdf.text("Firma del Encargado de Sucursal", 105, 238, { align: "center" });
+
+            pdf.save(`Resumen_${tipo}_${branch.branch_name.replace(/\s+/g, '_')}.pdf`);
+
+        } catch (error) {
+            alert("Error crítico: " + error.message);
+        }
+    };
+    
+
+   
+            // 🔥 TUS REGISTROS GLOBALES (Verifica que estén todos)
+            window.deleteReport = deleteReport;
+            window.editReport = editReport;
+            window.closeEditReportModal = closeEditReportModal;
+            window.saveEditReport = saveEditReport;
+            window.editCalculateFinalStock = editCalculateFinalStock;
+            // window.generarPDF ya no necesita registrarse aquí porque se declaró con "window."
+
+            init();
+
+            // Simular tiempo de carga
+            window.addEventListener('load', () => {
+                setTimeout(hideLoadingScreen, 1500);
+            });
+        </script>
+</body>
+
+</html>
