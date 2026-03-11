@@ -157,33 +157,56 @@
                     <div id="section-bodega" class="hidden p-4 sm:p-8">
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                             <h2 class="text-2xl font-black text-amber-900 flex items-center gap-2"><i data-lucide="warehouse" class="w-6 h-6"></i> Bodega Principal</h2>
-                            <button onclick="window.openEntradaBodega()" class="btn-primary w-full sm:w-auto px-5 py-2.5 rounded-xl text-white font-bold flex justify-center items-center gap-2 shadow-md hover:shadow-lg">
-                                <i data-lucide="package-plus" class="w-5 h-5"></i> Registrar Entrada
-                            </button>
+                            
+                            <div class="flex gap-2 w-full sm:w-auto">
+                                <button onclick="window.openEditBodega()" class="w-full sm:w-auto px-4 py-2.5 rounded-xl text-amber-800 bg-amber-100 hover:bg-amber-200 font-bold flex justify-center items-center gap-2 shadow-sm transition-colors">
+                                    <i data-lucide="edit" class="w-5 h-5"></i> Editar Stock
+                                </button>
+                                <button onclick="window.openEntradaBodega()" class="btn-primary w-full sm:w-auto px-5 py-2.5 rounded-xl text-white font-bold flex justify-center items-center gap-2 shadow-md hover:shadow-lg">
+                                    <i data-lucide="package-plus" class="w-5 h-5"></i> Registrar Entrada
+                                </button>
+                            </div>
                         </div>
                         <h3 class="font-bold text-amber-800 mb-3">Stock Disponible en Bodega</h3>
                         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8" id="bodega-stock-cards"></div>
-                        
-                        <div class="bg-white rounded-2xl card-shadow p-5 border-t-4 border-amber-500">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-lg sm:text-xl font-bold text-amber-900 flex items-center gap-2"><i data-lucide="history" class="w-5 h-5"></i> Historial de Movimientos</h3>
-                                <button onclick="window.toggleBodegaHistory()" class="text-amber-600 bg-amber-50 hover:bg-amber-100 p-2 rounded-lg transition-colors font-bold flex items-center gap-2 text-sm">
-                                    <span id="bodega-history-text" class="hidden sm:inline">Minimizar</span>
-                                    <i data-lucide="chevron-up" id="bodega-history-icon" class="w-5 h-5"></i>
-                                </button>
-                            </div>
-                            
-                            <div id="bodega-history-container" class="grid lg:grid-cols-3 gap-6 transition-all duration-300 origin-top">
-                                <div class="lg:col-span-1">
-                                    <label class="block text-sm font-bold text-amber-800 mb-3 text-center bg-amber-100 py-1.5 rounded-lg">Filtrar por Fecha</label>
-                                    <div id="bodega-calendar-container" class="bg-amber-50 p-3 rounded-xl border border-amber-100"></div>
-                                </div>
-                                <div class="lg:col-span-2">
-                                    <div id="bodega-movements-list" class="space-y-3 max-h-[400px] overflow-y-auto pr-2"></div>
-                                </div>
-                            </div>
-                        </div>
+                        <h3 class="text-xl font-bold text-amber-900 mb-4 border-b border-amber-100 pb-2">Historial de Movimientos</h3>
+                        <div id="bodega-movements-list" class="space-y-3 max-h-[500px] overflow-y-auto pr-2"></div>
                     </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div id="edit-bodega-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[75] transition-opacity">
+            <div class="bg-white rounded-2xl w-full max-w-2xl p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+                <h3 class="text-xl sm:text-2xl font-black text-amber-800 mb-2 flex items-center gap-2"><i data-lucide="edit-3"></i> Ajustar Stock de Bodega</h3>
+                <p class="text-sm font-semibold text-gray-600 mb-6 pb-4 border-b border-gray-100">Ingresa la cantidad exacta de harina que hay físicamente en la bodega principal.</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="p-3 border-2 border-amber-100 bg-amber-50/30 rounded-xl">
+                        <label class="block text-xs font-bold text-amber-800 mb-2 uppercase">Maseca Premium</label>
+                        <div class="flex gap-2"><input type="number" id="eb-maseca-b" class="w-1/2 px-2 py-2 border border-amber-200 rounded text-center font-bold" placeholder="Bultos"><input type="number" id="eb-maseca-k" class="w-1/2 px-2 py-2 border border-amber-200 rounded text-center font-bold" placeholder="Kilos"></div>
+                    </div>
+                    <div class="p-3 border-2 border-amber-100 bg-amber-50/30 rounded-xl">
+                        <label class="block text-xs font-bold text-amber-800 mb-2 uppercase">Harimasa Blanca</label>
+                        <div class="flex gap-2"><input type="number" id="eb-blanca-b" class="w-1/2 px-2 py-2 border border-amber-200 rounded text-center font-bold" placeholder="Bultos"><input type="number" id="eb-blanca-k" class="w-1/2 px-2 py-2 border border-amber-200 rounded text-center font-bold" placeholder="Kilos"></div>
+                    </div>
+                    <div class="p-3 border-2 border-amber-100 bg-amber-50/30 rounded-xl">
+                        <label class="block text-xs font-bold text-amber-800 mb-2 uppercase">Harimasa Amarilla</label>
+                        <div class="flex gap-2"><input type="number" id="eb-amarilla-b" class="w-1/2 px-2 py-2 border border-amber-200 rounded text-center font-bold" placeholder="Bultos"><input type="number" id="eb-amarilla-k" class="w-1/2 px-2 py-2 border border-amber-200 rounded text-center font-bold" placeholder="Kilos"></div>
+                    </div>
+                    <div class="p-3 border-2 border-amber-100 bg-amber-50/30 rounded-xl">
+                        <label class="block text-xs font-bold text-amber-800 mb-2 uppercase">Harimasa Fardo</label>
+                        <div class="flex gap-2"><input type="number" id="eb-fardo-b" class="w-1/2 px-2 py-2 border border-amber-200 rounded text-center font-bold" placeholder="Bultos"><input type="number" id="eb-fardo-k" class="w-1/2 px-2 py-2 border border-amber-200 rounded text-center font-bold" placeholder="Kilos"></div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col-reverse sm:flex-row gap-3 mt-8">
+                    <button onclick="document.getElementById('edit-bodega-modal').classList.add('hidden')" class="w-full sm:flex-1 py-3 border-2 border-gray-200 font-bold rounded-xl hover:bg-gray-50">Cancelar</button> 
+                    <button id="save-edit-bodega-btn" onclick="window.saveEditBodega()" class="w-full sm:flex-1 py-3 bg-amber-600 text-white hover:bg-amber-700 font-bold rounded-xl shadow-md">Guardar Stock Exacto</button>
+                </div>
+            </div>
+        </div>
 
         <div id="employee-panel" class="hidden h-full bg-amber-50 flex flex-col overflow-hidden">
             <div class="bg-white border-b border-amber-200 p-4 sticky top-0 z-20 shadow-sm shrink-0">
@@ -305,17 +328,52 @@
         </div>
 
         <div id="branch-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 transition-opacity">
-            <div class="bg-white rounded-2xl w-full max-w-md p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
-                <h3 id="branch-modal-title" class="text-xl sm:text-2xl font-black text-amber-900 mb-6">Nueva Sucursal</h3>
+            <div class="bg-white rounded-2xl w-full max-w-lg p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
+                <h3 id="branch-modal-title" class="text-xl sm:text-2xl font-black text-amber-900 mb-4">Nueva Sucursal</h3>
                 <div class="space-y-4">
                     <input type="hidden" id="modal-branch-id">
-                    <div><label class="block text-sm font-bold text-amber-800 mb-1.5">Nombre de Sucursal</label> <input type="text" id="modal-branch-name" class="w-full px-4 py-3 rounded-xl border-2 border-amber-200 focus:border-amber-400 outline-none transition-colors text-sm sm:text-base"> </div>
-                    <div><label class="block text-sm font-bold text-amber-800 mb-1.5">Existencia Inicial (Bultos)</label> <input type="number" id="modal-initial-bultos" min="0" value="0" class="w-full px-4 py-3 rounded-xl border-2 border-amber-200 focus:border-amber-400 outline-none transition-colors text-sm sm:text-base"> </div>
-                    <div><label class="block text-sm font-bold text-amber-800 mb-1.5">Existencia Inicial (Kilos)</label> <input type="number" id="modal-initial-kilos" min="0" value="0" class="w-full px-4 py-3 rounded-xl border-2 border-amber-200 focus:border-amber-400 outline-none transition-colors text-sm sm:text-base"> </div>
+                    <div>
+                        <label class="block text-sm font-bold text-amber-800 mb-1.5">Nombre de Sucursal</label> 
+                        <input type="text" id="modal-branch-name" class="w-full px-4 py-3 rounded-xl border-2 border-amber-200 focus:border-amber-400 outline-none transition-colors text-sm sm:text-base"> 
+                    </div>
+                    
+                    <h4 class="font-bold text-amber-800 text-sm mt-6 border-b border-amber-100 pb-2">Inventario Asignado (Harinas)</h4>
+                    <p class="text-xs text-amber-600 mb-3">Si editas y reduces la cantidad, los bultos sobrantes regresarán a la Bodega Principal automáticamente.</p>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="p-3 border-2 border-amber-100 rounded-xl bg-gray-50/50">
+                            <label class="block text-[11px] font-bold text-amber-600 uppercase mb-1">Maseca Premium</label>
+                            <div class="flex gap-1">
+                                <input type="number" id="mb-mas-b" placeholder="Bts" class="w-1/2 px-2 py-1.5 text-center border rounded font-bold outline-none focus:border-amber-400">
+                                <input type="number" id="mb-mas-k" placeholder="Kg" class="w-1/2 px-2 py-1.5 text-center border rounded font-bold outline-none focus:border-amber-400">
+                            </div>
+                        </div>
+                        <div class="p-3 border-2 border-amber-100 rounded-xl bg-gray-50/50">
+                            <label class="block text-[11px] font-bold text-amber-600 uppercase mb-1">Harimasa Blanca</label>
+                            <div class="flex gap-1">
+                                <input type="number" id="mb-bla-b" placeholder="Bts" class="w-1/2 px-2 py-1.5 text-center border rounded font-bold outline-none focus:border-amber-400">
+                                <input type="number" id="mb-bla-k" placeholder="Kg" class="w-1/2 px-2 py-1.5 text-center border rounded font-bold outline-none focus:border-amber-400">
+                            </div>
+                        </div>
+                        <div class="p-3 border-2 border-amber-100 rounded-xl bg-gray-50/50">
+                            <label class="block text-[11px] font-bold text-amber-600 uppercase mb-1">Harimasa Amarilla</label>
+                            <div class="flex gap-1">
+                                <input type="number" id="mb-ama-b" placeholder="Bts" class="w-1/2 px-2 py-1.5 text-center border rounded font-bold outline-none focus:border-amber-400">
+                                <input type="number" id="mb-ama-k" placeholder="Kg" class="w-1/2 px-2 py-1.5 text-center border rounded font-bold outline-none focus:border-amber-400">
+                            </div>
+                        </div>
+                        <div class="p-3 border-2 border-amber-100 rounded-xl bg-gray-50/50">
+                            <label class="block text-[11px] font-bold text-amber-600 uppercase mb-1">Harimasa Fardo</label>
+                            <div class="flex gap-1">
+                                <input type="number" id="mb-far-b" placeholder="Bts" class="w-1/2 px-2 py-1.5 text-center border rounded font-bold outline-none focus:border-amber-400">
+                                <input type="number" id="mb-far-k" placeholder="Kg" class="w-1/2 px-2 py-1.5 text-center border rounded font-bold outline-none focus:border-amber-400">
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="flex flex-col-reverse sm:flex-row gap-3 mt-8">
-                    <button id="cancel-branch-modal" class="w-full sm:flex-1 py-3.5 border-2 border-amber-200 text-amber-700 font-bold rounded-xl hover:bg-amber-50 transition-colors">Cancelar</button>
-                    <button id="save-branch-btn" class="w-full sm:flex-1 py-3.5 btn-primary text-white font-bold rounded-xl shadow-md">Guardar</button>
+                    <button onclick="window.closeBranchModal()" class="w-full sm:flex-1 py-3.5 border-2 border-amber-200 text-amber-700 font-bold rounded-xl hover:bg-amber-50 transition-colors">Cancelar</button>
+                    <button id="save-branch-btn" onclick="window.saveBranch()" class="w-full sm:flex-1 py-3.5 btn-primary text-white font-bold rounded-xl shadow-md">Guardar y Sincronizar</button>
                 </div>
             </div>
         </div>
@@ -466,7 +524,6 @@
     </div> 
      
     <script type="module">
-        // 🔥 ACTUALIZACIÓN: Importamos setDoc para la Bodega 🔥
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -483,15 +540,13 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // ================= VARIABLES GLOBALES =================
         let usersList = [];
         let branchesList = [];
         let reportsList = [];
         
-        // 🔥 NUEVAS VARIABLES DE BODEGA 🔥
         let bodegaStock = { maseca_bultos: 0, maseca_kilos: 0, blanca_bultos: 0, blanca_kilos: 0, amarilla_bultos: 0, amarilla_kilos: 0, fardo_bultos: 0, fardo_kilos: 0 };
         let bodegaMovements = [];
-        
-        // 🔥 NUEVAS VARIABLES PARA EL CALENDARIO DE BODEGA 🔥
         let currentBodegaMonth = new Date();
         let selectedBodegaDate = null;
         let isBodegaHistoryMinimized = false;
@@ -502,38 +557,25 @@
         let currentCalendarMonth = new Date();
         let isSubmitting = false;
 
+        // ================= SINCRONIZACIÓN EN TIEMPO REAL =================
         const dataHandler = {
             onDataChanged() {
                 if (currentUser) {
                     if (currentUser.role === 'admin') {
-                        renderUsers();
-                        renderBranches();
-                        updateBranchSelects();
-                        if (selectedBranchForReport) renderCalendar();
-                        if (selectedBranchForReport && selectedDate) showReportDetail(selectedDate);
+                        window.renderUsers();
+                        window.renderBranches();
+                        window.updateBranchSelects();
+                        if (selectedBranchForReport) window.renderCalendar();
+                        if (selectedBranchForReport && selectedDate) window.showReportDetail(selectedDate);
                         if (typeof window.renderBodega === 'function') window.renderBodega();
-                    } else if (!document.getElementById('employee-panel').classList.contains('hidden')) {
-                        // 🔥 Forzamos la actualización visual siempre que lleguen datos de la nube
-                        if (typeof window.actualizarStockVisual === 'function') window.actualizarStockVisual();
+                    } else {
+                        const empPanel = document.getElementById('employee-panel');
+                        if (empPanel && !empPanel.classList.contains('hidden')) {
+                            if (typeof window.actualizarStockVisual === 'function') window.actualizarStockVisual();
+                        }
                     }
                 }
             }
-        };
-
-        // 🔥 NUEVA FUNCIÓN MAESTRA (A prueba de mayúsculas y espacios en blanco)
-        window.actualizarStockVisual = function() {
-            if (!currentUser) return;
-            const userBranch = String(currentUser.branch_name || '').trim().toLowerCase();
-            const branch = getBranches().find(b => String(b.branch_name || '').trim().toLowerCase() === userBranch);
-            
-            if (branch) {
-                document.getElementById('initial-bultos').textContent = parseInt(branch.initial_stock_bultos) || 0;
-                document.getElementById('initial-kilos').textContent = parseInt(branch.initial_stock_kilos) || 0;
-            } else {
-                document.getElementById('initial-bultos').textContent = "0";
-                document.getElementById('initial-kilos').textContent = "0";
-            }
-            if (typeof window.calculateFinalStock === 'function') window.calculateFinalStock();
         };
 
         function init() {
@@ -549,8 +591,6 @@
                 reportsList = snapshot.docs.map(doc => ({ ...doc.data(), __backendId: doc.id, type: 'report' }));
                 dataHandler.onDataChanged();
             });
-
-            // 🔥 CONEXIÓN A FIREBASE PARA LA BODEGA 🔥
             onSnapshot(doc(db, 'bodega', 'main'), (docSnap) => {
                 if (docSnap.exists()) bodegaStock = docSnap.data();
                 dataHandler.onDataChanged();
@@ -560,25 +600,16 @@
                 dataHandler.onDataChanged();
             });
 
-            setupEventListeners();
-            updateDateDisplay();
-            lucide.createIcons();
-
-            window.editUser = editUser;
-            window.deleteUser = deleteUser;
-            window.editBranch = editBranch;
-            window.deleteBranch = deleteBranch;
-            window.openRestockModal = openRestockModal;
-            window.prevMonth = prevMonth;
-            window.nextMonth = nextMonth;
-            window.selectDate = selectDate;
+            window.setupEventListeners();
+            window.updateDateDisplay();
+            if(typeof lucide !== 'undefined') lucide.createIcons();
         }
 
-        function getUsers() { return usersList; }
-        function getBranches() { return branchesList; }
-        function getReports() { return reportsList; }
+        window.getUsers = function() { return usersList; };
+        window.getBranches = function() { return branchesList; };
+        window.getReports = function() { return reportsList; };
 
-        function showToast(message, isError = false) {
+        window.showToast = function(message, isError = false) {
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toast-message');
             if (!toast || !toastMessage) return;
@@ -587,76 +618,80 @@
             toastMessage.textContent = message;
             toast.classList.remove('hidden');
             setTimeout(() => { if (toast) toast.classList.add('hidden'); }, 3500);
-        }
+        };
 
-        function updateDateDisplay() {
+        window.updateDateDisplay = function() {
             const today = new Date();
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('report-date-display').textContent = today.toLocaleDateString('es-MX', options);
-        }
+            const el = document.getElementById('report-date-display');
+            if(el) el.textContent = today.toLocaleDateString('es-MX', options);
+        };
 
         // ================= AUTENTICACIÓN =================
-        function handleLogin() {
+        window.handleLogin = function() {
             const username = document.getElementById('login-username').value.trim();
             const password = document.getElementById('login-password').value;
             const errorEl = document.getElementById('login-error');
 
             if (username === 'admin' && password === 'admin') {
                 currentUser = { username: 'admin', role: 'admin', branch_name: 'Todas' };
-                showAdminPanel();
+                window.showAdminPanel();
                 return;
             }
 
-            const user = getUsers().find(u => u.username === username && u.password === password);
+            const user = window.getUsers().find(u => u.username === username && u.password === password);
             if (user) {
                 currentUser = user;
-                if (user.role === 'admin') showAdminPanel();
-                else showEmployeePanel();
+                if (user.role === 'admin') window.showAdminPanel();
+                else window.showEmployeePanel();
             } else {
                 errorEl.textContent = 'Usuario o contraseña incorrectos';
                 errorEl.classList.remove('hidden');
             }
-        }
+        };
 
-        function showAdminPanel() {
+        window.showAdminPanel = function() {
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('admin-panel').classList.remove('hidden');
             document.getElementById('employee-panel').classList.add('hidden');
             document.getElementById('admin-username-display').textContent = currentUser.username;
             document.body.classList.remove('bg-gradient-to-br', 'from-[#f8981d]', 'to-[#e65c00]');
             document.body.classList.add('bg-amber-50');
-            renderUsers();
-            renderBranches();
-            updateBranchSelects();
-            lucide.createIcons();
-        }
-        function showEmployeePanel() {
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('admin-panel').classList.add('hidden');
-            document.getElementById('employee-panel').classList.remove('hidden');
-            document.body.classList.remove('bg-gradient-to-br', 'from-[#f8981d]', 'to-[#e65c00]');
-            document.body.classList.add('bg-amber-50');
-            
-            document.getElementById('employee-branch-display').textContent = currentUser.branch_name || 'Sin sucursal';
+            window.renderUsers();
+            window.renderBranches();
+            window.updateBranchSelects();
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+        };
 
-            // 🔥 Hacer que la caja verde calcule en vivo mientras teclean
+        window.showEmployeePanel = function() {
+            try {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('admin-panel').classList.add('hidden');
+                document.getElementById('employee-panel').classList.remove('hidden');
+                document.body.classList.remove('bg-gradient-to-br', 'from-[#f8981d]', 'to-[#e65c00]');
+                document.body.classList.add('bg-amber-50');
+                
+                const displayEl = document.getElementById('employee-branch-display');
+                if(displayEl) displayEl.textContent = currentUser.branch_name || 'Sin sucursal';
+
+                // Escuchadores para calcular la existencia final en vivo
+                const inputs = ['maseca-bultos', 'maseca-kilos', 'harimasa-blanca-bultos', 'harimasa-blanca-kilos', 'harimasa-amarilla-bultos', 'harimasa-amarilla-kilos', 'harimasa-fardo-bultos', 'harimasa-fardo-kilos'];
+                inputs.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el && !el.hasAttribute('data-listener')) { 
+                        el.addEventListener('input', window.calculateFinalStock);
+                        el.setAttribute('data-listener', 'true');
+                    }
+                });
+
+                window.actualizarStockVisual();
+                if(typeof lucide !== 'undefined') lucide.createIcons();
+            } catch (error) { console.error(error); }
+        };
+
+        window.logout = function() {
             const inputs = ['maseca-bultos', 'maseca-kilos', 'harimasa-blanca-bultos', 'harimasa-blanca-kilos', 'harimasa-amarilla-bultos', 'harimasa-amarilla-kilos', 'harimasa-fardo-bultos', 'harimasa-fardo-kilos'];
-            inputs.forEach(id => {
-                const el = document.getElementById(id);
-                if (el && !el.hasAttribute('data-listener')) { 
-                    el.addEventListener('input', () => { if(typeof window.calculateFinalStock === 'function') window.calculateFinalStock(); });
-                    el.setAttribute('data-listener', 'true');
-                }
-            });
-
-            // Llamar a la función maestra
-            if (typeof window.actualizarStockVisual === 'function') window.actualizarStockVisual();
-            lucide.createIcons();
-        }
-
-        function logout() {
-            const inputs = ['maseca-bultos', 'maseca-kilos', 'harimasa-blanca-bultos', 'harimasa-blanca-kilos', 'harimasa-amarilla-bultos', 'harimasa-amarilla-kilos', 'harimasa-fardo-bultos', 'harimasa-fardo-kilos'];
-            inputs.forEach(id => { if (document.getElementById(id)) document.getElementById(id).value = ''; });
+            inputs.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
             currentUser = null;
             document.getElementById('login-screen').classList.remove('hidden');
             document.getElementById('admin-panel').classList.add('hidden');
@@ -664,34 +699,33 @@
             document.getElementById('login-username').value = '';
             document.getElementById('login-password').value = '';
             document.getElementById('login-error').classList.add('hidden');
-            if (window.limpiarFormularioEmpleado) window.limpiarFormularioEmpleado();
-            closeMobileMenu();
+            if (typeof window.limpiarFormularioEmpleado === 'function') window.limpiarFormularioEmpleado();
+            window.closeMobileMenu();
             document.body.classList.remove('bg-amber-50');
             document.body.classList.add('bg-gradient-to-br', 'from-[#f8981d]', 'to-[#e65c00]');
-        }
+        };
 
-        // ================= MENU MÓVIL =================
-        function toggleMobileMenu() {
+        window.toggleMobileMenu = function() {
             const sidebar = document.getElementById('admin-sidebar');
             const overlay = document.getElementById('sidebar-overlay');
             if (sidebar.classList.contains('-translate-x-full')) {
                 sidebar.classList.remove('-translate-x-full');
                 overlay.classList.remove('hidden');
-            } else closeMobileMenu();
-        }
+            } else window.closeMobileMenu();
+        };
 
-        function closeMobileMenu() {
+        window.closeMobileMenu = function() {
             document.getElementById('admin-sidebar').classList.add('-translate-x-full');
             document.getElementById('sidebar-overlay').classList.add('hidden');
-        }
+        };
 
-        // ================= FUNCIONES ADMIN =================
-        function renderUsers() {
+        // ================= UI ADMIN =================
+        window.renderUsers = function() {
             const container = document.getElementById('users-list');
-            const users = getUsers();
+            const users = window.getUsers();
             if (users.length === 0) {
                 container.innerHTML = `<div class="text-center py-12 text-amber-600 bg-white rounded-xl"><i data-lucide="users" class="w-12 h-12 mx-auto mb-3 opacity-50"></i><p>No hay usuarios registrados</p></div>`;
-                lucide.createIcons();
+                if(typeof lucide !== 'undefined') lucide.createIcons();
                 return;
             }
             container.innerHTML = users.map(user => `
@@ -706,19 +740,19 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2 w-full md:w-auto">
-                    <button onclick="editUser('${user.__backendId}')" class="flex-1 md:flex-none justify-center px-4 py-2.5 sm:py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold rounded-lg transition-colors flex items-center gap-2 text-sm sm:text-base"><i data-lucide="edit" class="w-4 h-4"></i> Editar</button>
-                    <button onclick="deleteUser('${user.__backendId}')" class="flex-1 md:flex-none justify-center px-4 py-2.5 sm:py-2 bg-red-50 text-red-600 hover:bg-red-100 font-bold rounded-lg transition-colors flex items-center gap-2 text-sm sm:text-base"><i data-lucide="trash-2" class="w-4 h-4"></i> Eliminar</button>
+                    <button onclick="window.editUser('${user.__backendId}')" class="flex-1 md:flex-none justify-center px-4 py-2.5 sm:py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold rounded-lg transition-colors flex items-center gap-2 text-sm sm:text-base"><i data-lucide="edit" class="w-4 h-4"></i> Editar</button>
+                    <button onclick="window.deleteUser('${user.__backendId}')" class="flex-1 md:flex-none justify-center px-4 py-2.5 sm:py-2 bg-red-50 text-red-600 hover:bg-red-100 font-bold rounded-lg transition-colors flex items-center gap-2 text-sm sm:text-base"><i data-lucide="trash-2" class="w-4 h-4"></i> Eliminar</button>
                 </div>
             </div>`).join('');
-            lucide.createIcons();
-        }
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+        };
 
-        function renderBranches() {
+        window.renderBranches = function() {
             const container = document.getElementById('branches-list');
-            const branches = getBranches();
+            const branches = window.getBranches();
             if (branches.length === 0) {
                 container.innerHTML = `<div class="text-center py-12 text-amber-600 bg-white rounded-xl"><i data-lucide="store" class="w-12 h-12 mx-auto mb-3 opacity-50"></i><p>No hay sucursales registradas</p></div>`;
-                lucide.createIcons();
+                if(typeof lucide !== 'undefined') lucide.createIcons();
                 return;
             }
             container.innerHTML = branches.map(branch => `
@@ -734,9 +768,9 @@
                 </div>
                 <div class="w-full xl:w-auto flex flex-col gap-2.5">
                     <div class="grid grid-cols-3 gap-2">
-                        <button onclick="openRestockModal('${branch.__backendId}')" class="flex-1 justify-center px-2 py-2 bg-green-50 text-green-700 hover:bg-green-100 font-bold rounded-lg transition-colors flex items-center gap-1.5 text-xs sm:text-sm"><i data-lucide="package-plus" class="w-4 h-4"></i> <span class="hidden sm:inline">Recargar</span></button>
-                        <button onclick="editBranch('${branch.__backendId}')" class="flex-1 justify-center px-2 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold rounded-lg transition-colors flex items-center gap-1.5 text-xs sm:text-sm"><i data-lucide="edit" class="w-4 h-4"></i> <span class="hidden sm:inline">Editar</span></button>
-                        <button onclick="deleteBranch('${branch.__backendId}')" class="flex-1 justify-center px-2 py-2 bg-red-50 text-red-600 hover:bg-red-100 font-bold rounded-lg transition-colors flex items-center gap-1.5 text-xs sm:text-sm"><i data-lucide="trash-2" class="w-4 h-4"></i> <span class="hidden sm:inline">Eliminar</span></button>
+                        <button onclick="window.openRestockModal('${branch.__backendId}')" class="flex-1 justify-center px-2 py-2 bg-green-50 text-green-700 hover:bg-green-100 font-bold rounded-lg transition-colors flex items-center gap-1.5 text-xs sm:text-sm"><i data-lucide="package-plus" class="w-4 h-4"></i> <span class="hidden sm:inline">Recargar</span></button>
+                        <button onclick="window.editBranch('${branch.__backendId}')" class="flex-1 justify-center px-2 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold rounded-lg transition-colors flex items-center gap-1.5 text-xs sm:text-sm"><i data-lucide="edit" class="w-4 h-4"></i> <span class="hidden sm:inline">Editar</span></button>
+                        <button onclick="window.deleteBranch('${branch.__backendId}')" class="flex-1 justify-center px-2 py-2 bg-red-50 text-red-600 hover:bg-red-100 font-bold rounded-lg transition-colors flex items-center gap-1.5 text-xs sm:text-sm"><i data-lucide="trash-2" class="w-4 h-4"></i> <span class="hidden sm:inline">Eliminar</span></button>
                     </div>
                     <div class="grid grid-cols-2 gap-2 border-t border-gray-100 pt-2.5">
                         <button onclick="window.descargarReporteSucursal('${branch.__backendId}', 'semanal')" class="justify-center py-2 bg-amber-100 text-amber-800 hover:bg-amber-200 font-bold rounded-lg transition-colors flex items-center gap-2 text-xs sm:text-sm shadow-sm"><i data-lucide="file-text" class="w-4 h-4"></i> PDF Semanal</button>
@@ -744,18 +778,43 @@
                     </div>
                 </div>
             </div>`).join('');
-            lucide.createIcons();
-        }
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+        };
 
-        function updateBranchSelects() {
-            const branches = getBranches();
+        window.updateBranchSelects = function() {
+            const branches = window.getBranches();
             const options = '<option value="">-- Seleccione --</option>' + branches.map(b => `<option value="${b.branch_name}">${b.branch_name}</option>`).join('');
-            document.getElementById('modal-branch').innerHTML = options;
-            document.getElementById('report-branch-select').innerHTML = options;
-        }
+            const modalEl = document.getElementById('modal-branch');
+            const reportEl = document.getElementById('report-branch-select');
+            if(modalEl) modalEl.innerHTML = options;
+            if(reportEl) reportEl.innerHTML = options;
+        };
 
-        // ================= FIREBASE CRUD =================
-        async function saveUser() {
+        // ================= CRUD USUARIOS =================
+        window.openUserModal = function() {
+            document.getElementById('user-modal').classList.remove('hidden');
+            ['modal-user-id', 'modal-username', 'modal-password', 'modal-branch'].forEach(id => {
+                const el = document.getElementById(id); if(el) el.value = '';
+            });
+            document.getElementById('user-modal-title').textContent = 'Nuevo Usuario';
+            document.getElementById('modal-role').value = 'empleado';
+        };
+
+        window.editUser = function(userId) {
+            const user = window.getUsers().find(d => d.__backendId === userId);
+            if (!user) return;
+            document.getElementById('user-modal').classList.remove('hidden');
+            document.getElementById('user-modal-title').textContent = 'Editar Usuario';
+            document.getElementById('modal-user-id').value = userId;
+            document.getElementById('modal-username').value = user.username || '';
+            document.getElementById('modal-password').value = user.password || '';
+            document.getElementById('modal-branch').value = user.branch_name || '';
+            document.getElementById('modal-role').value = user.role || 'empleado';
+        };
+
+        window.closeUserModal = function() { document.getElementById('user-modal').classList.add('hidden'); };
+
+        window.saveUser = async function() {
             if (isSubmitting) return;
             const userId = document.getElementById('modal-user-id').value;
             const username = document.getElementById('modal-username').value.trim();
@@ -763,84 +822,154 @@
             const branch = document.getElementById('modal-branch').value;
             const role = document.getElementById('modal-role').value;
 
-            if (!username || !password) return showToast('Complete todos los campos', true);
+            if (!username || !password) return window.showToast('Complete todos los campos', true);
             isSubmitting = true;
-            document.getElementById('save-user-btn').innerHTML = '<i class="lucide-loader animate-spin inline w-4 h-4 mr-2"></i> Guardando';
-            document.getElementById('save-user-btn').disabled = true;
+            const btn = document.getElementById('save-user-btn');
+            btn.innerHTML = '<i class="lucide-loader animate-spin inline w-4 h-4 mr-2"></i> Guardando';
+            btn.disabled = true;
 
             try {
                 if (userId) {
                     await updateDoc(doc(db, 'users', userId), { username, password, branch_name: branch, role });
-                    showToast('Usuario actualizado exitosamente');
+                    window.showToast('Usuario actualizado exitosamente');
                 } else {
                     await addDoc(collection(db, 'users'), { type: 'user', username, password, branch_name: branch, role });
-                    showToast('Usuario creado exitosamente');
+                    window.showToast('Usuario creado exitosamente');
                 }
-                closeUserModal();
-            } catch (error) { showToast('Error al guardar usuario', true); } 
+                window.closeUserModal();
+            } catch (error) { window.showToast('Error al guardar usuario', true); } 
             finally {
                 isSubmitting = false;
-                document.getElementById('save-user-btn').textContent = 'Guardar';
-                document.getElementById('save-user-btn').disabled = false;
+                btn.textContent = 'Guardar';
+                btn.disabled = false;
             }
-        }
+        };
 
-        async function deleteUser(id) {
+        window.deleteUser = async function(id) {
             if (!confirm("¿Seguro que deseas eliminar este usuario?")) return;
-            try { await deleteDoc(doc(db, 'users', id)); showToast('Usuario eliminado'); } catch (e) { showToast('Error al eliminar', true); }
-        }
+            try { await deleteDoc(doc(db, 'users', id)); window.showToast('Usuario eliminado'); } catch (e) { window.showToast('Error al eliminar', true); }
+        };
 
-        async function saveBranch() {
+        // ================= CRUD SUCURSALES (CON MATEMÁTICAS A BODEGA) =================
+        window.openBranchModal = function() {
+            document.getElementById('branch-modal').classList.remove('hidden');
+            document.getElementById('modal-branch-id').value = '';
+            document.getElementById('modal-branch-name').value = '';
+            ['mb-mas-b','mb-mas-k','mb-bla-b','mb-bla-k','mb-ama-b','mb-ama-k','mb-far-b','mb-far-k'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.value = '';
+            });
+            document.getElementById('branch-modal-title').textContent = 'Nueva Sucursal';
+        };
+
+        window.editBranch = function(branchId) {
+            const branch = window.getBranches().find(b => b.__backendId === branchId);
+            if (!branch) return;
+            document.getElementById('branch-modal').classList.remove('hidden');
+            document.getElementById('branch-modal-title').textContent = 'Editar Sucursal';
+            document.getElementById('modal-branch-id').value = branchId;
+            document.getElementById('modal-branch-name').value = branch.branch_name || '';
+            
+            document.getElementById('mb-mas-b').value = branch.b_mas_b || 0; document.getElementById('mb-mas-k').value = branch.b_mas_k || 0;
+            document.getElementById('mb-bla-b').value = branch.b_bla_b || 0; document.getElementById('mb-bla-k').value = branch.b_bla_k || 0;
+            document.getElementById('mb-ama-b').value = branch.b_ama_b || 0; document.getElementById('mb-ama-k').value = branch.b_ama_k || 0;
+            document.getElementById('mb-far-b').value = branch.b_far_b || 0; document.getElementById('mb-far-k').value = branch.b_far_k || 0;
+        };
+
+        window.closeBranchModal = function() { document.getElementById('branch-modal').classList.add('hidden'); };
+
+        window.saveBranch = async function() {
             if (isSubmitting) return;
             const branchId = document.getElementById('modal-branch-id').value;
             const name = document.getElementById('modal-branch-name').value.trim();
-            const bultos = parseInt(document.getElementById('modal-initial-bultos').value) || 0;
-            const kilos = parseInt(document.getElementById('modal-initial-kilos').value) || 0;
+            if (!name) return window.showToast('Ingrese el nombre de la sucursal', true);
+            
+            const branch = branchId ? window.getBranches().find(b => b.__backendId === branchId) : null;
+            
+            const getV = (id) => parseInt(document.getElementById(id).value) || 0;
+            const nMasB = getV('mb-mas-b'), nMasK = getV('mb-mas-k');
+            const nBlaB = getV('mb-bla-b'), nBlaK = getV('mb-bla-k');
+            const nAmaB = getV('mb-ama-b'), nAmaK = getV('mb-ama-k');
+            const nFarB = getV('mb-far-b'), nFarK = getV('mb-far-k');
 
-            if (!name) return showToast('Ingrese el nombre de la sucursal', true);
             isSubmitting = true;
-            document.getElementById('save-branch-btn').innerHTML = '<i class="lucide-loader animate-spin inline w-4 h-4 mr-2"></i> Guardando';
-            document.getElementById('save-branch-btn').disabled = true;
+            const btn = document.getElementById('save-branch-btn');
+            btn.innerHTML = '<i class="lucide-loader animate-spin inline w-4 h-4 mr-2"></i> Sincronizando...';
+            btn.disabled = true;
 
             try {
+                const calcD = (oB, oK, nB, nK) => ((nB||0)*20 + (nK||0)) - ((oB||0)*20 + (oK||0));
+                const dMas = calcD(branch?.b_mas_b, branch?.b_mas_k, nMasB, nMasK);
+                const dBla = calcD(branch?.b_bla_b, branch?.b_bla_k, nBlaB, nBlaK);
+                const dAma = calcD(branch?.b_ama_b, branch?.b_ama_k, nAmaB, nAmaK);
+                const dFar = calcD(branch?.b_far_b, branch?.b_far_k, nFarB, nFarK);
+
+                const aplD = (cB, cK, delta) => {
+                    let t = ((cB||0)*20 + (cK||0)) - delta; 
+                    return { b: (t<0?-1:1)*Math.floor(Math.abs(t)/20), k: (t<0?-1:1)*(Math.abs(t)%20) };
+                };
+                const fMas = aplD(bodegaStock.maseca_bultos, bodegaStock.maseca_kilos, dMas);
+                const fBla = aplD(bodegaStock.blanca_bultos, bodegaStock.blanca_kilos, dBla);
+                const fAma = aplD(bodegaStock.amarilla_bultos, bodegaStock.amarilla_kilos, dAma);
+                const fFar = aplD(bodegaStock.fardo_bultos, bodegaStock.fardo_kilos, dFar);
+
+                await setDoc(doc(db, 'bodega', 'main'), {
+                    maseca_bultos: fMas.b, maseca_kilos: fMas.k, blanca_bultos: fBla.b, blanca_kilos: fBla.k,
+                    amarilla_bultos: fAma.b, amarilla_kilos: fAma.k, fardo_bultos: fFar.b, fardo_kilos: fFar.k
+                });
+
+                const totalKilos = (nMasB+nBlaB+nAmaB+nFarB)*20 + (nMasK+nBlaK+nAmaK+nFarK);
+                const branchData = {
+                    branch_name: name,
+                    initial_stock_bultos: Math.floor(totalKilos/20), initial_stock_kilos: totalKilos%20,
+                    b_mas_b: nMasB, b_mas_k: nMasK, b_bla_b: nBlaB, b_bla_k: nBlaK,
+                    b_ama_b: nAmaB, b_ama_k: nAmaK, b_far_b: nFarB, b_far_k: nFarK
+                };
+
                 if (branchId) {
-                    await updateDoc(doc(db, 'branches', branchId), { branch_name: name, initial_stock_bultos: bultos, initial_stock_kilos: kilos });
-                    showToast('Sucursal actualizada exitosamente');
+                    await updateDoc(doc(db, 'branches', branchId), branchData);
+                    window.showToast('Sucursal actualizada exitosamente');
                 } else {
-                    await addDoc(collection(db, 'branches'), { type: 'branch', branch_name: name, initial_stock_bultos: bultos, initial_stock_kilos: kilos });
-                    showToast('Sucursal creada exitosamente');
+                    branchData.type = 'branch';
+                    await addDoc(collection(db, 'branches'), branchData);
+                    window.showToast('Sucursal creada exitosamente');
                 }
-                closeBranchModal();
-            } catch (error) { showToast('Error al procesar sucursal', true); } 
-            finally {
-                isSubmitting = false;
-                document.getElementById('save-branch-btn').textContent = 'Guardar';
-                document.getElementById('save-branch-btn').disabled = false;
-            }
-        }
 
-        async function deleteBranch(id) {
+                if (dMas !== 0 || dBla !== 0 || dAma !== 0 || dFar !== 0) {
+                    const isReturn = (dMas + dBla + dAma + dFar) < 0; 
+                    const absB = (delta) => Math.floor(Math.abs(delta)/20);
+                    const absK = (delta) => Math.abs(delta)%20;
+
+                    await addDoc(collection(db, 'bodega_movements'), {
+                        type: isReturn ? 'entrada' : 'salida',
+                        date: new Date().toISOString(), user: currentUser.username,
+                        branch_name: name + (isReturn ? ' (Devolución por Edición)' : ' (Ajuste por Edición)'),
+                        maseca_bultos: absB(dMas), maseca_kilos: absK(dMas),
+                        blanca_bultos: absB(dBla), blanca_kilos: absK(dBla),
+                        amarilla_bultos: absB(dAma), amarilla_kilos: absK(dAma),
+                        fardo_bultos: absB(dFar), fardo_kilos: absK(dFar)
+                    });
+                }
+                window.closeBranchModal();
+            } catch (error) { window.showToast('Error al procesar sucursal', true); console.error(error); } 
+            finally { isSubmitting = false; btn.innerHTML = 'Guardar y Sincronizar'; btn.disabled = false; }
+        };
+
+        window.deleteBranch = async function(id) {
             if (!confirm("¿Seguro que deseas eliminar esta sucursal?")) return;
-            try { await deleteDoc(doc(db, 'branches', id)); showToast('Sucursal eliminada'); } catch (e) { showToast('Error al eliminar', true); }
-        }
+            try { await deleteDoc(doc(db, 'branches', id)); window.showToast('Sucursal eliminada'); } catch (e) { window.showToast('Error al eliminar', true); }
+        };
 
-        // 🔥 LÓGICA ACTUALIZADA DE BODEGA PRINCIPAL Y CALENDARIO 🔥
-        
-        // Función para ocultar/mostrar el panel
+        // ================= BODEGA PRINCIPAL Y RECARGA =================
         window.toggleBodegaHistory = function() {
             isBodegaHistoryMinimized = !isBodegaHistoryMinimized;
             const container = document.getElementById('bodega-history-container');
             const icon = document.getElementById('bodega-history-icon');
             const text = document.getElementById('bodega-history-text');
-            
             if (isBodegaHistoryMinimized) {
-                container.classList.add('hidden');
-                icon.setAttribute('data-lucide', 'chevron-down');
-                text.textContent = 'Expandir';
+                container.classList.add('hidden'); icon.setAttribute('data-lucide', 'chevron-down'); text.textContent = 'Expandir';
             } else {
-                container.classList.remove('hidden');
-                icon.setAttribute('data-lucide', 'chevron-up');
-                text.textContent = 'Minimizar';
+                container.classList.remove('hidden'); icon.setAttribute('data-lucide', 'chevron-up'); text.textContent = 'Minimizar';
             }
             if(typeof lucide !== 'undefined') lucide.createIcons();
         };
@@ -848,27 +977,12 @@
         window.renderBodega = function() {
             const containerCards = document.getElementById('bodega-stock-cards');
             if(!containerCards) return;
-
             containerCards.innerHTML = `
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-amber-200 text-center">
-                    <p class="text-xs text-amber-600 font-bold uppercase mb-1">Maseca Premium</p>
-                    <p class="text-2xl font-black text-amber-900">${bodegaStock.maseca_bultos||0}<span class="text-sm font-normal">b</span> ${bodegaStock.maseca_kilos||0}<span class="text-sm font-normal">kg</span></p>
-                </div>
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-amber-200 text-center">
-                    <p class="text-xs text-amber-600 font-bold uppercase mb-1">Harimasa Blanca</p>
-                    <p class="text-2xl font-black text-amber-900">${bodegaStock.blanca_bultos||0}<span class="text-sm font-normal">b</span> ${bodegaStock.blanca_kilos||0}<span class="text-sm font-normal">kg</span></p>
-                </div>
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-amber-200 text-center">
-                    <p class="text-xs text-amber-600 font-bold uppercase mb-1">Harimasa Amarilla</p>
-                    <p class="text-2xl font-black text-amber-900">${bodegaStock.amarilla_bultos||0}<span class="text-sm font-normal">b</span> ${bodegaStock.amarilla_kilos||0}<span class="text-sm font-normal">kg</span></p>
-                </div>
-                <div class="bg-white p-5 rounded-xl shadow-sm border border-amber-200 text-center">
-                    <p class="text-xs text-amber-600 font-bold uppercase mb-1">Harimasa Fardo</p>
-                    <p class="text-2xl font-black text-amber-900">${bodegaStock.fardo_bultos||0}<span class="text-sm font-normal">b</span> ${bodegaStock.fardo_kilos||0}<span class="text-sm font-normal">kg</span></p>
-                </div>
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-amber-200 text-center"><p class="text-xs text-amber-600 font-bold uppercase mb-1">Maseca Premium</p><p class="text-2xl font-black text-amber-900">${bodegaStock.maseca_bultos||0}<span class="text-sm font-normal">b</span> ${bodegaStock.maseca_kilos||0}<span class="text-sm font-normal">kg</span></p></div>
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-amber-200 text-center"><p class="text-xs text-amber-600 font-bold uppercase mb-1">Harimasa Blanca</p><p class="text-2xl font-black text-amber-900">${bodegaStock.blanca_bultos||0}<span class="text-sm font-normal">b</span> ${bodegaStock.blanca_kilos||0}<span class="text-sm font-normal">kg</span></p></div>
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-amber-200 text-center"><p class="text-xs text-amber-600 font-bold uppercase mb-1">Harimasa Amarilla</p><p class="text-2xl font-black text-amber-900">${bodegaStock.amarilla_bultos||0}<span class="text-sm font-normal">b</span> ${bodegaStock.amarilla_kilos||0}<span class="text-sm font-normal">kg</span></p></div>
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-amber-200 text-center"><p class="text-xs text-amber-600 font-bold uppercase mb-1">Harimasa Fardo</p><p class="text-2xl font-black text-amber-900">${bodegaStock.fardo_bultos||0}<span class="text-sm font-normal">b</span> ${bodegaStock.fardo_kilos||0}<span class="text-sm font-normal">kg</span></p></div>
             `;
-
-            // Llamamos a pintar el calendario y la lista
             window.renderBodegaCalendar();
             window.renderBodegaList();
         };
@@ -876,105 +990,180 @@
         window.renderBodegaCalendar = function() {
             const container = document.getElementById('bodega-calendar-container');
             if(!container) return;
-
-            const year = currentBodegaMonth.getFullYear();
-            const month = currentBodegaMonth.getMonth();
-            const firstDay = new Date(year, month, 1);
-            const lastDay = new Date(year, month + 1, 0);
-            const startDay = firstDay.getDay();
-
+            const year = currentBodegaMonth.getFullYear(); const month = currentBodegaMonth.getMonth();
+            const firstDay = new Date(year, month, 1); const lastDay = new Date(year, month + 1, 0); const startDay = firstDay.getDay();
             const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
             const dayNames = ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa'];
-
-            // Extraemos solo las fechas que tienen movimientos (formato YYYY-MM-DD)
             const movementDates = [...new Set(bodegaMovements.map(m => m.date.split('T')[0]))];
 
-            let html = `
-                <div class="flex items-center justify-between mb-3 bg-white p-2 rounded-lg shadow-sm">
-                    <button onclick="window.prevBodegaMonth()" class="p-1 hover:bg-amber-100 rounded-md transition-colors"><i data-lucide="chevron-left" class="w-4 h-4 text-amber-700"></i></button>
-                    <span class="font-bold text-amber-900 text-sm">${monthNames[month]} ${year}</span>
-                    <button onclick="window.nextBodegaMonth()" class="p-1 hover:bg-amber-100 rounded-md transition-colors"><i data-lucide="chevron-right" class="w-4 h-4 text-amber-700"></i></button>
-                </div>
-                <div class="grid grid-cols-7 gap-1 text-center mb-1">
-                    ${dayNames.map(d => `<div class="text-[10px] font-bold text-amber-600 py-1 uppercase">${d}</div>`).join('')}
-                </div>
-                <div class="grid grid-cols-7 gap-1 mb-3">
-            `;
-
+            let html = `<div class="flex items-center justify-between mb-3 bg-white p-2 rounded-lg shadow-sm"><button onclick="window.prevBodegaMonth()" class="p-1 hover:bg-amber-100 rounded-md transition-colors"><i data-lucide="chevron-left" class="w-4 h-4 text-amber-700"></i></button><span class="font-bold text-amber-900 text-sm">${monthNames[month]} ${year}</span><button onclick="window.nextBodegaMonth()" class="p-1 hover:bg-amber-100 rounded-md transition-colors"><i data-lucide="chevron-right" class="w-4 h-4 text-amber-700"></i></button></div><div class="grid grid-cols-7 gap-1 text-center mb-1">${dayNames.map(d => `<div class="text-[10px] font-bold text-amber-600 py-1 uppercase">${d}</div>`).join('')}</div><div class="grid grid-cols-7 gap-1 mb-3">`;
             for (let i = 0; i < startDay; i++) html += `<div class="p-1"></div>`;
-
             for (let day = 1; day <= lastDay.getDate(); day++) {
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const hasMovement = movementDates.includes(dateStr);
-                const isSelected = selectedBodegaDate === dateStr;
-
+                const hasMovement = movementDates.includes(dateStr); const isSelected = selectedBodegaDate === dateStr;
                 let btnClasses = 'text-amber-800 hover:bg-amber-100';
                 if (hasMovement) btnClasses = 'bg-amber-200 text-amber-900 font-bold border border-amber-300 shadow-sm';
                 if (isSelected) btnClasses = 'bg-amber-600 text-white font-black shadow-md border-transparent';
-
                 html += `<button onclick="window.selectBodegaDate('${dateStr}')" class="aspect-square flex items-center justify-center p-1 rounded-md text-[11px] sm:text-xs transition-all ${btnClasses}">${day}</button>`;
             }
-
-            html += `</div>`;
-            html += `<button onclick="window.selectBodegaDate(null)" class="w-full py-2 text-xs font-bold text-amber-700 bg-white border-2 border-amber-200 rounded-lg hover:bg-amber-50 shadow-sm transition-colors">Ver Todo el Historial</button>`;
-
+            html += `</div><button onclick="window.selectBodegaDate(null)" class="w-full py-2 text-xs font-bold text-amber-700 bg-white border-2 border-amber-200 rounded-lg hover:bg-amber-50 shadow-sm transition-colors">Ver Todo el Historial</button>`;
             container.innerHTML = html;
             if(typeof lucide !== 'undefined') lucide.createIcons();
         };
 
         window.prevBodegaMonth = function() { currentBodegaMonth.setMonth(currentBodegaMonth.getMonth() - 1); window.renderBodegaCalendar(); };
         window.nextBodegaMonth = function() { currentBodegaMonth.setMonth(currentBodegaMonth.getMonth() + 1); window.renderBodegaCalendar(); };
-        
-        window.selectBodegaDate = function(dateStr) { 
-            selectedBodegaDate = dateStr; 
-            window.renderBodegaCalendar(); 
-            window.renderBodegaList(); 
-        };
+        window.selectBodegaDate = function(dateStr) { selectedBodegaDate = dateStr; window.renderBodegaCalendar(); window.renderBodegaList(); };
 
         window.renderBodegaList = function() {
             const listContainer = document.getElementById('bodega-movements-list');
             if(!listContainer) return;
-
-            // Filtramos los movimientos dependiendo de la fecha seleccionada
+            
             let filteredMovements = bodegaMovements;
             if (selectedBodegaDate) {
                 filteredMovements = bodegaMovements.filter(m => m.date.startsWith(selectedBodegaDate));
             }
 
             if (filteredMovements.length === 0) {
-                listContainer.innerHTML = `
-                    <div class="text-center p-8 bg-gray-50 rounded-xl border border-dashed border-gray-200 text-gray-500">
-                        <i data-lucide="inbox" class="w-12 h-12 mx-auto mb-3 opacity-40"></i>
-                        <p class="font-bold">No hay registros</p>
-                        <p class="text-xs mt-1">No hubo entradas ni despachos en esta fecha.</p>
-                    </div>`;
-            } else {
-                listContainer.innerHTML = filteredMovements.map(m => {
-                    const isEntrada = m.type === 'entrada';
-                    const dateStr = new Date(m.date).toLocaleString('es-MX', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
-                    return `
-                    <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 ${isEntrada ? 'border-amber-500' : 'border-green-500'} flex flex-col xl:flex-row xl:justify-between xl:items-center text-sm gap-3">
-                        <div>
-                            <p class="font-black text-gray-800 flex items-center gap-1">${isEntrada ? '<i data-lucide="package-plus" class="w-4 h-4 text-amber-600"></i> Entrada de Proveedor' : '<i data-lucide="package-minus" class="w-4 h-4 text-green-600"></i> Despacho a: ' + m.branch_name}</p>
-                            <p class="text-xs text-gray-500 mt-1">${dateStr} • Registrado por: <span class="font-bold">${m.user}</span></p>
-                        </div>
-                        <div class="text-left xl:text-right text-[11px] font-medium text-gray-600 bg-gray-50 p-2.5 rounded-lg border border-gray-100 flex gap-3 flex-wrap items-center">
-                            ${m.maseca_bultos||m.maseca_kilos ? `<span><b class="text-amber-700">Maseca:</b> ${m.maseca_bultos||0}b ${m.maseca_kilos||0}k</span>` : ''}
-                            ${m.blanca_bultos||m.blanca_kilos ? `<span><b class="text-amber-700">Blanca:</b> ${m.blanca_bultos||0}b ${m.blanca_kilos||0}k</span>` : ''}
-                            ${m.amarilla_bultos||m.amarilla_kilos ? `<span><b class="text-amber-700">Amarilla:</b> ${m.amarilla_bultos||0}b ${m.amarilla_kilos||0}k</span>` : ''}
-                            ${m.fardo_bultos||m.fardo_kilos ? `<span><b class="text-amber-700">Fardo:</b> ${m.fardo_bultos||0}b ${m.fardo_kilos||0}k</span>` : ''}
-                        </div>
-                    </div>`;
-                }).join('');
+                listContainer.innerHTML = `<div class="text-center p-8 bg-gray-50 rounded-xl border border-dashed border-gray-200 text-gray-500"><i data-lucide="inbox" class="w-12 h-12 mx-auto mb-3 opacity-40"></i><p class="font-bold">No hay registros en esta fecha.</p></div>`;
+                if(typeof lucide !== 'undefined') lucide.createIcons();
+                return;
             }
+
+            const grouped = {};
+            filteredMovements.forEach(m => {
+                const dateObj = new Date(m.date);
+                const dateKey = dateObj.toLocaleDateString('es-MX', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                if (!grouped[dateKey]) grouped[dateKey] = [];
+                grouped[dateKey].push(m);
+            });
+
+            let html = '';
+            
+            for (const [dateGroup, movements] of Object.entries(grouped)) {
+                const dateTitle = dateGroup.charAt(0).toUpperCase() + dateGroup.slice(1);
+                
+                html += `
+                <div class="sticky top-0 bg-white/95 backdrop-blur-sm py-2.5 z-10 mb-2 mt-4 first:mt-0 border-b border-amber-100">
+                    <h4 class="text-xs font-black text-amber-800 uppercase tracking-wider flex items-center gap-2">
+                        <i data-lucide="calendar-days" class="w-4 h-4"></i> ${dateTitle}
+                    </h4>
+                </div>`;
+                         
+                html += `<div class="space-y-3 pl-1 sm:pl-2">`;
+                
+                movements.forEach(m => {
+                    const isEntrada = m.type === 'entrada';
+                    const isAjuste = m.type === 'ajuste'; // 🔥 Detectar si fue un ajuste manual
+                    const timeStr = new Date(m.date).toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit'});
+                    
+                    let pills = '';
+                    if(m.maseca_bultos || m.maseca_kilos) pills += `<div class="flex flex-col bg-orange-50 border border-orange-200 rounded-lg p-1.5 min-w-[70px] text-center shadow-sm"><span class="text-[9px] uppercase font-bold text-orange-600 mb-0.5">Maseca</span><span class="text-xs font-black text-orange-900">${m.maseca_bultos||0}b ${m.maseca_kilos||0}k</span></div>`;
+                    if(m.blanca_bultos || m.blanca_kilos) pills += `<div class="flex flex-col bg-slate-50 border border-slate-200 rounded-lg p-1.5 min-w-[70px] text-center shadow-sm"><span class="text-[9px] uppercase font-bold text-slate-600 mb-0.5">Blanca</span><span class="text-xs font-black text-slate-900">${m.blanca_bultos||0}b ${m.blanca_kilos||0}k</span></div>`;
+                    if(m.amarilla_bultos || m.amarilla_kilos) pills += `<div class="flex flex-col bg-yellow-50 border border-yellow-200 rounded-lg p-1.5 min-w-[70px] text-center shadow-sm"><span class="text-[9px] uppercase font-bold text-yellow-600 mb-0.5">Amarilla</span><span class="text-xs font-black text-yellow-900">${m.amarilla_bultos||0}b ${m.amarilla_kilos||0}k</span></div>`;
+                    if(m.fardo_bultos || m.fardo_kilos) pills += `<div class="flex flex-col bg-stone-50 border border-stone-200 rounded-lg p-1.5 min-w-[70px] text-center shadow-sm"><span class="text-[9px] uppercase font-bold text-stone-600 mb-0.5">Fardo</span><span class="text-xs font-black text-stone-900">${m.fardo_bultos||0}b ${m.fardo_kilos||0}k</span></div>`;
+
+                    // Colores de borde y títulos dinámicos dependiendo el tipo
+                    let borderClass = isAjuste ? 'border-l-blue-500' : (isEntrada ? 'border-l-amber-500' : 'border-l-green-500');
+                    let iconHtml = isAjuste ? '<div class="p-1.5 bg-blue-100 text-blue-700 rounded-lg"><i data-lucide="settings-2" class="w-4 h-4"></i></div>' : (isEntrada ? '<div class="p-1.5 bg-amber-100 text-amber-700 rounded-lg"><i data-lucide="package-plus" class="w-4 h-4"></i></div>' : '<div class="p-1.5 bg-green-100 text-green-700 rounded-lg"><i data-lucide="package-minus" class="w-4 h-4"></i></div>');
+                    let titleHtml = isAjuste ? m.branch_name : (isEntrada ? 'Entrada de Proveedor' : 'Despacho a: ' + m.branch_name);
+
+                    html += `
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 border-l-4 ${borderClass} hover:shadow-md transition-shadow relative overflow-hidden">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    ${iconHtml}
+                                    <h4 class="font-bold text-gray-800 text-sm">${titleHtml}</h4>
+                                </div>
+                                <p class="text-[11px] text-gray-500 mt-2 flex items-center gap-1 font-medium"><i data-lucide="user" class="w-3 h-3"></i> Registró: ${m.user}</p>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <span class="inline-flex items-center gap-1 px-2 py-1 bg-gray-50 text-gray-500 text-[11px] font-bold rounded-lg border border-gray-200">
+                                    <i data-lucide="clock" class="w-3 h-3"></i> ${timeStr}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2 pt-3 border-t border-gray-50">
+                            ${pills}
+                        </div>
+                    </div>`;
+                });
+                
+                html += `</div>`; 
+            }
+
+            listContainer.innerHTML = html;
             if(typeof lucide !== 'undefined') lucide.createIcons();
         };
+
+        // ================= EDITAR STOCK PRINCIPAL (BODEGA) =================
+        window.openEditBodega = function() {
+            document.getElementById('eb-maseca-b').value = bodegaStock.maseca_bultos || 0;
+            document.getElementById('eb-maseca-k').value = bodegaStock.maseca_kilos || 0;
+            document.getElementById('eb-blanca-b').value = bodegaStock.blanca_bultos || 0;
+            document.getElementById('eb-blanca-k').value = bodegaStock.blanca_kilos || 0;
+            document.getElementById('eb-amarilla-b').value = bodegaStock.amarilla_bultos || 0;
+            document.getElementById('eb-amarilla-k').value = bodegaStock.amarilla_kilos || 0;
+            document.getElementById('eb-fardo-b').value = bodegaStock.fardo_bultos || 0;
+            document.getElementById('eb-fardo-k').value = bodegaStock.fardo_kilos || 0;
+            document.getElementById('edit-bodega-modal').classList.remove('hidden');
+        };
+
+        window.saveEditBodega = async function() {
+            const getVal = (id) => parseInt(document.getElementById(id).value) || 0;
+            const nMasB = getVal('eb-maseca-b'), nMasK = getVal('eb-maseca-k');
+            const nBlaB = getVal('eb-blanca-b'), nBlaK = getVal('eb-blanca-k');
+            const nAmaB = getVal('eb-amarilla-b'), nAmaK = getVal('eb-amarilla-k');
+            const nFarB = getVal('eb-fardo-b'), nFarK = getVal('eb-fardo-k');
+
+            const btn = document.getElementById('save-edit-bodega-btn');
+            btn.innerHTML = '<i class="lucide-loader animate-spin inline w-4 h-4 mr-2"></i> Guardando...'; 
+            btn.disabled = true;
+
+            try {
+                // Calcular las diferencias para guardar el movimiento exacto en el historial
+                const calcD = (oB, oK, nB, nK) => ((nB||0)*20 + (nK||0)) - ((oB||0)*20 + (oK||0));
+                const dMas = calcD(bodegaStock.maseca_bultos, bodegaStock.maseca_kilos, nMasB, nMasK);
+                const dBla = calcD(bodegaStock.blanca_bultos, bodegaStock.blanca_kilos, nBlaB, nBlaK);
+                const dAma = calcD(bodegaStock.amarilla_bultos, bodegaStock.amarilla_kilos, nAmaB, nAmaK);
+                const dFar = calcD(bodegaStock.fardo_bultos, bodegaStock.fardo_kilos, nFarB, nFarK);
+
+                // 1. Guardar la cantidad exacta obligatoria en Firebase
+                await setDoc(doc(db, 'bodega', 'main'), { 
+                    maseca_bultos: nMasB, maseca_kilos: nMasK, 
+                    blanca_bultos: nBlaB, blanca_kilos: nBlaK, 
+                    amarilla_bultos: nAmaB, amarilla_kilos: nAmaK, 
+                    fardo_bultos: nFarB, fardo_kilos: nFarK 
+                });
+
+                // 2. Registrar en historial solo si hubo modificación
+                if (dMas !== 0 || dBla !== 0 || dAma !== 0 || dFar !== 0) {
+                    const absB = (delta) => Math.floor(Math.abs(delta)/20);
+                    const absK = (delta) => Math.abs(delta)%20;
+                    
+                    await addDoc(collection(db, 'bodega_movements'), { 
+                        type: 'ajuste', 
+                        date: new Date().toISOString(), 
+                        user: currentUser.username, 
+                        branch_name: 'Ajuste Manual de Inventario',
+                        maseca_bultos: absB(dMas), maseca_kilos: absK(dMas), 
+                        blanca_bultos: absB(dBla), blanca_kilos: absK(dBla), 
+                        amarilla_bultos: absB(dAma), amarilla_kilos: absK(dAma), 
+                        fardo_bultos: absB(dFar), fardo_kilos: absK(dFar)
+                    });
+                }
+
+                window.showToast('¡Stock de bodega actualizado!');
+                document.getElementById('edit-bodega-modal').classList.add('hidden');
+            } catch(e) { alert("Error: " + e.message); } 
+            finally { btn.innerHTML = 'Guardar Stock Exacto'; btn.disabled = false; }
+        };
         window.openEntradaBodega = function() {
-            ['in-maseca-b','in-maseca-k','in-blanca-b','in-blanca-k','in-amarilla-b','in-amarilla-k','in-fardo-b','in-fardo-k'].forEach(id => document.getElementById(id).value = '');
+            ['in-maseca-b','in-maseca-k','in-blanca-b','in-blanca-k','in-amarilla-b','in-amarilla-k','in-fardo-b','in-fardo-k'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
             document.getElementById('entrada-bodega-modal').classList.remove('hidden');
         };
 
-        // Función matemática universal para harinas
         function calcFlour(cB, cK, addB, addK, sumar = true) {
             let totalC = (parseInt(cB)||0)*20 + (parseInt(cK)||0);
             let totalM = (parseInt(addB)||0)*20 + (parseInt(addK)||0);
@@ -1002,26 +1191,28 @@
                 const nAma = calcFlour(bodegaStock.amarilla_bultos, bodegaStock.amarilla_kilos, inAmaB, inAmaK, true);
                 const nFar = calcFlour(bodegaStock.fardo_bultos, bodegaStock.fardo_kilos, inFarB, inFarK, true);
 
-                await setDoc(doc(db, 'bodega', 'main'), {
-                    maseca_bultos: nMas.b, maseca_kilos: nMas.k, blanca_bultos: nBla.b, blanca_kilos: nBla.k,
-                    amarilla_bultos: nAma.b, amarilla_kilos: nAma.k, fardo_bultos: nFar.b, fardo_kilos: nFar.k
-                });
+                await setDoc(doc(db, 'bodega', 'main'), { maseca_bultos: nMas.b, maseca_kilos: nMas.k, blanca_bultos: nBla.b, blanca_kilos: nBla.k, amarilla_bultos: nAma.b, amarilla_kilos: nAma.k, fardo_bultos: nFar.b, fardo_kilos: nFar.k });
+                await addDoc(collection(db, 'bodega_movements'), { type: 'entrada', date: new Date().toISOString(), user: currentUser.username, maseca_bultos: inMasB, maseca_kilos: inMasK, blanca_bultos: inBlaB, blanca_kilos: inBlaK, amarilla_bultos: inAmaB, amarilla_kilos: inAmaK, fardo_bultos: inFarB, fardo_kilos: inFarK });
 
-                await addDoc(collection(db, 'bodega_movements'), {
-                    type: 'entrada', date: new Date().toISOString(), user: currentUser.username,
-                    maseca_bultos: inMasB, maseca_kilos: inMasK, blanca_bultos: inBlaB, blanca_kilos: inBlaK,
-                    amarilla_bultos: inAmaB, amarilla_kilos: inAmaK, fardo_bultos: inFarB, fardo_kilos: inFarK
-                });
-
-                showToast('¡Entrada registrada correctamente!');
+                window.showToast('¡Entrada registrada correctamente!');
                 document.getElementById('entrada-bodega-modal').classList.add('hidden');
             } catch(e) { alert("Error: " + e.message); } 
             finally { btn.innerHTML = 'Guardar Entrada'; btn.disabled = false; }
         };
 
+        window.openRestockModal = function(branchId) {
+            const branch = window.getBranches().find(b => b.__backendId === branchId);
+            if (!branch) return;
+            document.getElementById('restock-modal').classList.remove('hidden');
+            document.getElementById('restock-branch-id').value = branchId;
+            document.getElementById('restock-current-stock').innerHTML = `El stock actual es de: <b>${branch.initial_stock_bultos || 0} bultos y ${branch.initial_stock_kilos || 0} kg</b>. Completa las casillas para despachar de bodega a sucursal:`;
+            ['out-maseca-b','out-maseca-k','out-blanca-b','out-blanca-k','out-amarilla-b','out-amarilla-k','out-fardo-b','out-fardo-k'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+        };
+        window.closeRestockModal = function() { document.getElementById('restock-modal').classList.add('hidden'); };
+
         window.saveRestock = async function() {
             const branchId = document.getElementById('restock-branch-id').value;
-            const branch = getBranches().find(b => b.__backendId === branchId);
+            const branch = window.getBranches().find(b => b.__backendId === branchId);
             if (!branch) return;
 
             const getVal = (id) => parseInt(document.getElementById(id).value) || 0;
@@ -1032,196 +1223,176 @@
 
             const addBultos = outMasB + outBlaB + outAmaB + outFarB;
             const addKilos = outMasK + outBlaK + outAmaK + outFarK;
-
             if (addBultos === 0 && addKilos === 0) return alert('Ingresa una cantidad para recargar a la sucursal');
 
             const btn = document.getElementById('save-restock-btn');
             btn.innerHTML = 'Recargando...'; btn.disabled = true;
 
             try {
-                // 1. Restar de la Bodega
                 const nMas = calcFlour(bodegaStock.maseca_bultos, bodegaStock.maseca_kilos, outMasB, outMasK, false);
                 const nBla = calcFlour(bodegaStock.blanca_bultos, bodegaStock.blanca_kilos, outBlaB, outBlaK, false);
                 const nAma = calcFlour(bodegaStock.amarilla_bultos, bodegaStock.amarilla_kilos, outAmaB, outAmaK, false);
                 const nFar = calcFlour(bodegaStock.fardo_bultos, bodegaStock.fardo_kilos, outFarB, outFarK, false);
 
-                await setDoc(doc(db, 'bodega', 'main'), {
-                    maseca_bultos: nMas.b, maseca_kilos: nMas.k, blanca_bultos: nBla.b, blanca_kilos: nBla.k,
-                    amarilla_bultos: nAma.b, amarilla_kilos: nAma.k, fardo_bultos: nFar.b, fardo_kilos: nFar.k
-                });
+                await setDoc(doc(db, 'bodega', 'main'), { maseca_bultos: nMas.b, maseca_kilos: nMas.k, blanca_bultos: nBla.b, blanca_kilos: nBla.k, amarilla_bultos: nAma.b, amarilla_kilos: nAma.k, fardo_bultos: nFar.b, fardo_kilos: nFar.k });
 
-                // 2. Sumar total a la sucursal
+                const fBMas = calcFlour(branch.b_mas_b, branch.b_mas_k, outMasB, outMasK, true);
+                const fBBla = calcFlour(branch.b_bla_b, branch.b_bla_k, outBlaB, outBlaK, true);
+                const fBAma = calcFlour(branch.b_ama_b, branch.b_ama_k, outAmaB, outAmaK, true);
+                const fBFar = calcFlour(branch.b_far_b, branch.b_far_k, outFarB, outFarK, true);
+
                 const currentTotalKilos = ((branch.initial_stock_bultos || 0) * 20) + (branch.initial_stock_kilos || 0);
                 const newTotalKilos = currentTotalKilos + (addBultos * 20) + addKilos;
 
-                await updateDoc(doc(db, 'branches', branchId), {
-                    initial_stock_bultos: Math.floor(newTotalKilos / 20),
-                    initial_stock_kilos: newTotalKilos % 20
+                await updateDoc(doc(db, 'branches', branchId), { 
+                    initial_stock_bultos: Math.floor(newTotalKilos / 20), initial_stock_kilos: newTotalKilos % 20,
+                    b_mas_b: fBMas.b, b_mas_k: fBMas.k, b_bla_b: fBBla.b, b_bla_k: fBBla.k,
+                    b_ama_b: fBAma.b, b_ama_k: fBAma.k, b_far_b: fBFar.b, b_far_k: fBFar.k
                 });
 
-                // 3. Registrar Movimiento
-                await addDoc(collection(db, 'bodega_movements'), {
-                    type: 'salida', date: new Date().toISOString(), user: currentUser.username, branch_name: branch.branch_name,
-                    maseca_bultos: outMasB, maseca_kilos: outMasK, blanca_bultos: outBlaB, blanca_kilos: outBlaK,
-                    amarilla_bultos: outAmaB, amarilla_kilos: outAmaK, fardo_bultos: outFarB, fardo_kilos: outFarK
-                });
+                await addDoc(collection(db, 'bodega_movements'), { type: 'salida', date: new Date().toISOString(), user: currentUser.username, branch_name: branch.branch_name, maseca_bultos: outMasB, maseca_kilos: outMasK, blanca_bultos: outBlaB, blanca_kilos: outBlaK, amarilla_bultos: outAmaB, amarilla_kilos: outAmaK, fardo_bultos: outFarB, fardo_kilos: outFarK });
 
-                showToast('Despacho completado con éxito');
+                window.showToast('Despacho completado con éxito');
                 document.getElementById('restock-modal').classList.add('hidden');
-            } catch(e) { alert("Error: " + e.message); } 
-            finally { btn.innerHTML = 'Confirmar Despacho'; btn.disabled = false; }
+            } catch(e) { alert("Error: " + e.message); } finally { btn.innerHTML = 'Confirmar Despacho'; btn.disabled = false; }
         };
 
-        // ================= ESCOBA VIRTUAL (LIMPIEZA DE FORMULARIO) =================
-        window.limpiarFormularioEmpleado = function () {
-            const casillas = ['maseca-bultos', 'maseca-kilos', 'harimasa-blanca-bultos', 'harimasa-blanca-kilos', 'harimasa-amarilla-bultos', 'harimasa-amarilla-kilos', 'harimasa-fardo-bultos', 'harimasa-fardo-kilos'];
-            casillas.forEach(id => { const elemento = document.getElementById(id); if (elemento) elemento.value = ''; });
-            ['papel', 'teflon', 'grafito'].forEach(material => { const radioNo = document.querySelector(`input[name="${material}"][value="no"]`); if (radioNo) radioNo.checked = true; });
-            calculateFinalStock();
-            const scroll = document.getElementById('employee-scroll');
-            if (scroll) scroll.scrollTo({ top: 0, behavior: 'smooth' });
+        window.openEditMovement = function(id) {
+            const mov = bodegaMovements.find(m => m.id === id);
+            if (!mov || mov.type !== 'salida') return;
+            
+            document.getElementById('edit-mov-id').value = id;
+            document.getElementById('edit-mov-branch').value = mov.branch_name;
+            document.getElementById('edit-movement-info').textContent = `Ajustando el despacho a: ${mov.branch_name}`;
+            
+            document.getElementById('em-maseca-b').value = mov.maseca_bultos || 0; document.getElementById('em-maseca-k').value = mov.maseca_kilos || 0;
+            document.getElementById('em-blanca-b').value = mov.blanca_bultos || 0; document.getElementById('em-blanca-k').value = mov.blanca_kilos || 0;
+            document.getElementById('em-amarilla-b').value = mov.amarilla_bultos || 0; document.getElementById('em-amarilla-k').value = mov.amarilla_kilos || 0;
+            document.getElementById('em-fardo-b').value = mov.fardo_bultos || 0; document.getElementById('em-fardo-k').value = mov.fardo_kilos || 0;
+            
+            document.getElementById('edit-movement-modal').classList.remove('hidden');
         };
 
-        // ================= CALENDARIO =================
-        function renderCalendar() {
-            const container = document.getElementById('calendar-container');
-            const year = currentCalendarMonth.getFullYear();
-            const month = currentCalendarMonth.getMonth();
-            const firstDay = new Date(year, month, 1);
-            const lastDay = new Date(year, month + 1, 0);
-            const startDay = firstDay.getDay();
+        window.saveEditMovement = async function() {
+            const id = document.getElementById('edit-mov-id').value;
+            const branchName = document.getElementById('edit-mov-branch').value;
+            const mov = bodegaMovements.find(m => m.id === id);
+            const branch = window.getBranches().find(b => b.branch_name === branchName);
+            if (!mov) return;
 
-            const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-            const dayNames = ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa'];
+            const btn = document.getElementById('save-edit-mov-btn');
+            btn.innerHTML = '<i class="lucide-loader animate-spin inline w-4 h-4 mr-2"></i> Guardando...'; btn.disabled = true;
 
-            const reports = getReports().filter(r => r.branch_id === selectedBranchForReport || r.branch_name === selectedBranchForReport);
-            const reportDates = reports.map(r => r.report_date);
+            const getV = (id) => parseInt(document.getElementById(id).value) || 0;
+            const nMasB = getV('em-maseca-b'), nMasK = getV('em-maseca-k');
+            const nBlaB = getV('em-blanca-b'), nBlaK = getV('em-blanca-k');
+            const nAmaB = getV('em-amarilla-b'), nAmaK = getV('em-amarilla-k');
+            const nFarB = getV('em-fardo-b'), nFarK = getV('em-fardo-k');
 
-            let html = `
-            <div class="flex items-center justify-between mb-4 bg-amber-50 p-2 rounded-xl">
-            <button onclick="prevMonth()" class="p-2 hover:bg-amber-200 rounded-lg transition-colors"><i data-lucide="chevron-left" class="w-5 h-5 text-amber-700"></i></button>
-            <span class="font-bold text-amber-900">${monthNames[month]} ${year}</span>
-            <button onclick="nextMonth()" class="p-2 hover:bg-amber-200 rounded-lg transition-colors"><i data-lucide="chevron-right" class="w-5 h-5 text-amber-700"></i></button>
-            </div>
-            <div class="overflow-x-auto pb-2"><div class="min-w-[240px]"><div class="grid grid-cols-7 gap-1 text-center mb-2">
-            ${dayNames.map(d => `<div class="text-[11px] sm:text-xs font-bold text-amber-600 py-1 uppercase">${d}</div>`).join('')}
-            </div><div class="grid grid-cols-7 gap-1">`;
+            try {
+                const calcD = (oB, oK, nB, nK) => ((nB||0)*20 + (nK||0)) - ((oB||0)*20 + (oK||0));
+                const dMas = calcD(mov.maseca_bultos, mov.maseca_kilos, nMasB, nMasK);
+                const dBla = calcD(mov.blanca_bultos, mov.blanca_kilos, nBlaB, nBlaK);
+                const dAma = calcD(mov.amarilla_bultos, mov.amarilla_kilos, nAmaB, nAmaK);
+                const dFar = calcD(mov.fardo_bultos, mov.fardo_kilos, nFarB, nFarK);
 
-            for (let i = 0; i < startDay; i++) html += `<div class="p-2"></div>`;
-            for (let day = 1; day <= lastDay.getDate(); day++) {
-                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const hasReport = reportDates.includes(dateStr);
-                const isSelected = selectedDate === dateStr;
-                html += `<button onclick="selectDate('${dateStr}')" class="calendar-day aspect-square flex items-center justify-center p-1 sm:p-2 rounded-lg text-xs sm:text-sm font-bold ${hasReport ? 'has-report shadow-sm border border-emerald-200 text-emerald-800' : 'text-amber-800 hover:bg-amber-100'} ${isSelected ? 'selected shadow-md border-transparent' : ''}">${day}</button>`;
-            }
+                const aplD = (cB, cK, delta) => {
+                    let t = ((cB||0)*20 + (cK||0)) - delta; 
+                    return { b: (t<0?-1:1)*Math.floor(Math.abs(t)/20), k: (t<0?-1:1)*(Math.abs(t)%20) };
+                };
 
-            html += '</div></div></div>';
-            container.innerHTML = html;
-            lucide.createIcons();
-        }
+                const fMas = aplD(bodegaStock.maseca_bultos, bodegaStock.maseca_kilos, dMas);
+                const fBla = aplD(bodegaStock.blanca_bultos, bodegaStock.blanca_kilos, dBla);
+                const fAma = aplD(bodegaStock.amarilla_bultos, bodegaStock.amarilla_kilos, dAma);
+                const fFar = aplD(bodegaStock.fardo_bultos, bodegaStock.fardo_kilos, dFar);
 
-        function prevMonth() { currentCalendarMonth.setMonth(currentCalendarMonth.getMonth() - 1); renderCalendar(); }
-        function nextMonth() { currentCalendarMonth.setMonth(currentCalendarMonth.getMonth() + 1); renderCalendar(); }
-        function selectDate(dateStr) { selectedDate = dateStr; renderCalendar(); showReportDetail(dateStr); }
+                await setDoc(doc(db, 'bodega', 'main'), { maseca_bultos: fMas.b, maseca_kilos: fMas.k, blanca_bultos: fBla.b, blanca_kilos: fBla.k, amarilla_bultos: fAma.b, amarilla_kilos: fAma.k, fardo_bultos: fFar.b, fardo_kilos: fFar.k });
 
-        function showReportDetail(dateStr) {
-            const container = document.getElementById('report-detail');
-            const report = getReports().find(r => r.report_date === dateStr && (r.branch_id === selectedBranchForReport || r.branch_name === selectedBranchForReport));
+                if (branch) {
+                    const totalDelta = dMas + dBla + dAma + dFar;
+                    const curBranchTotal = (branch.initial_stock_bultos||0)*20 + (branch.initial_stock_kilos||0);
+                    const finalBranchTotal = Math.max(0, curBranchTotal + totalDelta);
+                    await updateDoc(doc(db, 'branches', branch.__backendId), { initial_stock_bultos: Math.floor(finalBranchTotal / 20), initial_stock_kilos: finalBranchTotal % 20 });
+                }
 
-            if (!report) {
-                container.innerHTML = `<div class="text-center text-amber-600 py-12 bg-amber-50 rounded-xl border border-dashed border-amber-200"><i data-lucide="file-x" class="w-16 h-16 mx-auto mb-4 opacity-40"></i><p class="font-semibold">No hay reporte registrado para esta fecha.</p></div>`;
-                lucide.createIcons();
-                return;
-            }
+                await updateDoc(doc(db, 'bodega_movements', id), { maseca_bultos: nMasB, maseca_kilos: nMasK, blanca_bultos: nBlaB, blanca_kilos: nBlaK, amarilla_bultos: nAmaB, amarilla_kilos: nAmaK, fardo_bultos: nFarB, fardo_kilos: nFarK });
 
-            const date = new Date(dateStr + 'T12:00:00');
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                window.showToast('Despacho modificado correctamente');
+                document.getElementById('edit-movement-modal').classList.add('hidden');
+            } catch (e) { alert('Error al modificar: ' + e.message); } 
+            finally { btn.innerHTML = 'Guardar Cambios'; btn.disabled = false; }
+        };
 
-            container.innerHTML = `
-            <div class="space-y-6">
-            <div class="border-b border-amber-100 pb-4">
-                <h3 class="text-lg sm:text-xl font-black text-amber-900 capitalize">${date.toLocaleDateString('es-MX', options)}</h3>
-                <p class="text-sm text-amber-600 mt-1">Enviado por: <span class="font-bold text-amber-800">${report.submitted_by}</span></p>
-            </div>
-            
-            <div class="grid grid-cols-2 gap-3 sm:gap-4">
-                <div class="p-3 bg-amber-50 rounded-xl border border-amber-100">
-                <p class="text-xs text-amber-600 uppercase font-bold mb-1">Existencia Inicial</p>
-                <p class="font-black text-amber-900 text-sm sm:text-base">${report.initial_stock_bultos || 0} bts / ${report.initial_stock_kilos || 0} kg</p>
-                </div>
-                <div class="p-3 bg-green-50 rounded-xl border border-green-100">
-                <p class="text-xs text-green-600 uppercase font-bold mb-1">Existencia Final</p>
-                <p class="font-black text-green-900 text-sm sm:text-base">${report.existencia_final_bultos || 0} bts / ${report.existencia_final_kilos || 0} kg</p>
-                </div>
-            </div>
+        // ================= FUNCIONES EMPLEADO (EN VIVO) =================
+        window.actualizarStockVisual = function() {
+            try {
+                if (!currentUser) return;
+                const rawBranchName = currentUser.branch_name ? currentUser.branch_name : '';
+                const userBranch = String(rawBranchName).trim().toLowerCase();
+                const branches = typeof window.getBranches === 'function' ? window.getBranches() : [];
+                const branch = branches.find(b => {
+                    const bName = b.branch_name ? b.branch_name : '';
+                    return String(bName).trim().toLowerCase() === userBranch;
+                });
+                
+                const elBultos = document.getElementById('initial-bultos');
+                const elKilos = document.getElementById('initial-kilos');
 
-            <div class="bg-gray-50 rounded-xl p-4 sm:p-5 border border-gray-100">
-                <h4 class="font-bold text-amber-900 mb-4 border-b border-gray-200 pb-2">Desglose de Consumo</h4>
-                <div class="space-y-2.5 text-sm">
-                <div class="flex flex-col sm:flex-row justify-between sm:items-center p-2.5 bg-white rounded-lg shadow-sm border border-gray-50"><span class="font-semibold text-slate-700 mb-1 sm:mb-0">Maseca Premium</span><span class="font-bold text-amber-700">${report.maseca_premium_bultos || 0} bts / ${report.maseca_premium_kilos || 0} kg</span></div>
-                <div class="flex flex-col sm:flex-row justify-between sm:items-center p-2.5 bg-white rounded-lg shadow-sm border border-gray-50"><span class="font-semibold text-slate-700 mb-1 sm:mb-0">Harimasa Blanca</span><span class="font-bold text-amber-700">${report.harimasa_blanca_bultos || 0} bts / ${report.harimasa_blanca_kilos || 0} kg</span></div>
-                <div class="flex flex-col sm:flex-row justify-between sm:items-center p-2.5 bg-white rounded-lg shadow-sm border border-gray-50"><span class="font-semibold text-slate-700 mb-1 sm:mb-0">Harimasa Amarilla</span><span class="font-bold text-amber-700">${report.harimasa_amarilla_bultos || 0} bts / ${report.harimasa_amarilla_kilos || 0} kg</span></div>
-                <div class="flex flex-col sm:flex-row justify-between sm:items-center p-2.5 bg-white rounded-lg shadow-sm border border-gray-50"><span class="font-semibold text-slate-700 mb-1 sm:mb-0">Harimasa Fardo</span><span class="font-bold text-amber-700">${report.harimasa_fardo_bultos || 0} bts / ${report.harimasa_fardo_kilos || 0} kg</span></div>
-                </div>
-            </div>
-            
-            <div>
-                <h4 class="font-bold text-amber-900 mb-3 text-sm">Materiales Solicitados</h4>
-                <div class="flex flex-wrap gap-2 text-xs font-bold">
-                <div class="px-3 py-1.5 rounded-full ${report.tiene_papel ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-gray-100 text-gray-500'}">Papel: ${report.tiene_papel ? 'SÍ' : 'NO'}</div>
-                <div class="px-3 py-1.5 rounded-full ${report.tiene_teflon ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-gray-100 text-gray-500'}">Teflón: ${report.tiene_teflon ? 'SÍ' : 'NO'}</div>
-                <div class="px-3 py-1.5 rounded-full ${report.tiene_grafito ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-gray-100 text-gray-500'}">Grafito: ${report.tiene_grafito ? 'SÍ' : 'NO'}</div>
-                </div>
-            </div>
+                if (branch) {
+                    if(elBultos) elBultos.textContent = parseInt(branch.initial_stock_bultos) || 0;
+                    if(elKilos) elKilos.textContent = parseInt(branch.initial_stock_kilos) || 0;
+                } else {
+                    if(elBultos) elBultos.textContent = "0";
+                    if(elKilos) elKilos.textContent = "0";
+                }
+                
+                if (typeof window.calculateFinalStock === 'function') window.calculateFinalStock();
+            } catch (e) { console.error("Error en actualizarStockVisual:", e); }
+        };
 
-            <div class="mt-6 flex flex-col sm:flex-row gap-3 border-t border-amber-100 pt-5">
-                <button onclick="editReport('${report.__backendId}')" class="flex-1 py-2.5 bg-blue-50 text-blue-600 font-bold rounded-xl hover:bg-blue-100 transition-colors flex items-center justify-center gap-2 shadow-sm"><i data-lucide="edit" class="w-4 h-4"></i> Editar</button>
-                <button onclick="deleteReport('${report.__backendId}')" class="flex-1 py-2.5 bg-red-50 text-red-600 font-bold rounded-xl hover:bg-red-100 transition-colors flex items-center justify-center gap-2 shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i> Eliminar</button>
-                <button onclick="window.generarPDF()" class="flex-1 py-2.5 bg-amber-600 text-white font-bold rounded-xl hover:bg-amber-700 transition-colors flex items-center justify-center gap-2 shadow-sm"><i data-lucide="download" class="w-4 h-4"></i> Descargar PDF</button>
-            </div>
-            </div>
-            `;
-            lucide.createIcons();
-        }
-
-        // ================= FUNCIONES EMPLEADO =================
         window.calculateFinalStock = function() {
-            const userBranch = String(currentUser?.branch_name || '').trim().toLowerCase();
-            const branch = getBranches().find(b => String(b.branch_name || '').trim().toLowerCase() === userBranch);
+            try {
+                const rawBranchName = (currentUser && currentUser.branch_name) ? currentUser.branch_name : '';
+                const userBranch = String(rawBranchName).trim().toLowerCase();
+                const branches = typeof window.getBranches === 'function' ? window.getBranches() : [];
+                const branch = branches.find(b => {
+                    const bName = b.branch_name ? b.branch_name : '';
+                    return String(bName).trim().toLowerCase() === userBranch;
+                });
 
-            // Asegurarnos de que siempre sea un número (parseInt)
-            const initialBultos = branch ? (parseInt(branch.initial_stock_bultos) || 0) : 0;
-            const initialKilos = branch ? (parseInt(branch.initial_stock_kilos) || 0) : 0;
+                const initialBultos = branch ? (parseInt(branch.initial_stock_bultos) || 0) : 0;
+                const initialKilos = branch ? (parseInt(branch.initial_stock_kilos) || 0) : 0;
 
-            const getVal = (id) => parseInt(document.getElementById(id)?.value) || 0;
-            const consumedBultos = getVal('maseca-bultos') + getVal('harimasa-blanca-bultos') + getVal('harimasa-amarilla-bultos') + getVal('harimasa-fardo-bultos');
-            const consumedKilos = getVal('maseca-kilos') + getVal('harimasa-blanca-kilos') + getVal('harimasa-amarilla-kilos') + getVal('harimasa-fardo-kilos');
+                const getVal = (id) => { const el = document.getElementById(id); return (el && el.value) ? parseInt(el.value) : 0; };
 
-            const totalConsumedKilos = (consumedBultos * 20) + consumedKilos;
-            const totalInitialKilos = (initialBultos * 20) + initialKilos;
+                const consumedBultos = getVal('maseca-bultos') + getVal('harimasa-blanca-bultos') + getVal('harimasa-amarilla-bultos') + getVal('harimasa-fardo-bultos');
+                const consumedKilos = getVal('maseca-kilos') + getVal('harimasa-blanca-kilos') + getVal('harimasa-amarilla-kilos') + getVal('harimasa-fardo-kilos');
 
-            const finalKilos = totalInitialKilos - totalConsumedKilos;
+                const totalConsumedKilos = (consumedBultos * 20) + consumedKilos;
+                const totalInitialKilos = (initialBultos * 20) + initialKilos;
+                const finalKilos = totalInitialKilos - totalConsumedKilos;
 
-            const finalBultosEl = document.getElementById('final-bultos');
-            const finalKilosEl = document.getElementById('final-kilos');
+                const finalBultosEl = document.getElementById('final-bultos');
+                const finalKilosEl = document.getElementById('final-kilos');
 
-            if(finalBultosEl) finalBultosEl.textContent = finalKilos < 0 ? 0 : Math.floor(finalKilos / 20);
-            if(finalKilosEl) finalKilosEl.textContent = finalKilos < 0 ? 0 : finalKilos % 20;
+                if(finalBultosEl) finalBultosEl.textContent = finalKilos < 0 ? 0 : Math.floor(finalKilos / 20);
+                if(finalKilosEl) finalKilosEl.textContent = finalKilos < 0 ? 0 : finalKilos % 20;
 
-            const finalContainer = finalBultosEl?.parentElement?.parentElement;
-            if (finalContainer) {
-                if (finalKilos < 0) finalContainer.classList.add('border-red-500');
-                else finalContainer.classList.remove('border-red-500');
-            }
+                if (finalBultosEl && finalBultosEl.parentElement && finalBultosEl.parentElement.parentElement) {
+                    const finalContainer = finalBultosEl.parentElement.parentElement;
+                    if (finalKilos < 0) finalContainer.classList.add('border-red-500');
+                    else finalContainer.classList.remove('border-red-500');
+                }
+            } catch (e) { console.error("Error en calculateFinalStock:", e); }
         };
 
         window.submitReport = async function() {
             isSubmitting = false; 
             if (!currentUser) return alert("Error: Tu sesión ha caducado.");
-            const branch = getBranches().find(b => b.branch_name === currentUser.branch_name);
+            const branch = window.getBranches().find(b => b.branch_name === currentUser.branch_name);
             if (!branch) return alert("Error: No se encontró la sucursal asignada a tu usuario.");
 
-            const getVal = (id) => parseInt(document.getElementById(id)?.value) || 0;
+            const getVal = (id) => { const el = document.getElementById(id); return (el && el.value) ? parseInt(el.value) : 0; };
             const consumedBultos = getVal('maseca-bultos') + getVal('harimasa-blanca-bultos') + getVal('harimasa-amarilla-bultos') + getVal('harimasa-fardo-bultos');
             const consumedKilos = getVal('maseca-kilos') + getVal('harimasa-blanca-kilos') + getVal('harimasa-amarilla-kilos') + getVal('harimasa-fardo-kilos');
 
@@ -1239,6 +1410,10 @@
                 const totalInitialKilos = ((branch.initial_stock_bultos || 0) * 20) + (branch.initial_stock_kilos || 0);
                 let newTotalKilos = Math.max(0, totalInitialKilos - totalConsumedKilos);
                 
+                const chkPapel = document.querySelector('input[name="papel"]:checked');
+                const chkTeflon = document.querySelector('input[name="teflon"]:checked');
+                const chkGrafito = document.querySelector('input[name="grafito"]:checked');
+
                 const reportData = {
                     type: 'report', report_date: dateStr, branch_id: branch.__backendId || currentUser.branch_name, branch_name: currentUser.branch_name,
                     initial_stock_bultos: branch.initial_stock_bultos || 0, initial_stock_kilos: branch.initial_stock_kilos || 0,
@@ -1246,9 +1421,9 @@
                     harimasa_blanca_bultos: getVal('harimasa-blanca-bultos'), harimasa_blanca_kilos: getVal('harimasa-blanca-kilos'),
                     harimasa_amarilla_bultos: getVal('harimasa-amarilla-bultos'), harimasa_amarilla_kilos: getVal('harimasa-amarilla-kilos'),
                     harimasa_fardo_bultos: getVal('harimasa-fardo-bultos'), harimasa_fardo_kilos: getVal('harimasa-fardo-kilos'),
-                    tiene_papel: document.querySelector('input[name="papel"]:checked')?.value === 'si',
-                    tiene_teflon: document.querySelector('input[name="teflon"]:checked')?.value === 'si',
-                    tiene_grafito: document.querySelector('input[name="grafito"]:checked')?.value === 'si',
+                    tiene_papel: chkPapel ? chkPapel.value === 'si' : false,
+                    tiene_teflon: chkTeflon ? chkTeflon.value === 'si' : false,
+                    tiene_grafito: chkGrafito ? chkGrafito.value === 'si' : false,
                     existencia_final_bultos: Math.floor(newTotalKilos / 20), existencia_final_kilos: newTotalKilos % 20,
                     submitted_by: currentUser.username, submitted_at: new Date().toISOString()
                 };
@@ -1256,141 +1431,87 @@
                 await addDoc(collection(db, 'reports'), reportData);
                 await updateDoc(doc(db, 'branches', branch.__backendId), { initial_stock_bultos: Math.floor(newTotalKilos / 20), initial_stock_kilos: newTotalKilos % 20 });
 
-                showToast('¡Reporte enviado exitosamente!');
-                window.limpiarFormularioEmpleado();
+                window.showToast('¡Reporte enviado exitosamente!');
+                if (typeof window.limpiarFormularioEmpleado === 'function') window.limpiarFormularioEmpleado();
             } catch (error) { alert("❌ Ocurrió un error: " + error.message); } 
             finally {
                 isSubmitting = false;
-                if (btn) { btn.innerHTML = '<i data-lucide="send" class="w-6 h-6"></i> Enviar Reporte Oficial'; btn.disabled = false; lucide.createIcons(); }
+                if (btn) { btn.innerHTML = '<i data-lucide="send" class="w-6 h-6"></i> Enviar Reporte Oficial'; btn.disabled = false; if(typeof lucide !== 'undefined') lucide.createIcons(); }
             }
         };
 
-        // ================= MODALS UI =================
-        function openUserModal() {
-            document.getElementById('user-modal').classList.remove('hidden');
-            ['modal-user-id', 'modal-username', 'modal-password', 'modal-branch'].forEach(id => document.getElementById(id).value = '');
-            document.getElementById('user-modal-title').textContent = 'Nuevo Usuario';
-            document.getElementById('modal-role').value = 'empleado';
-        }
-        function editUser(userId) {
-            const user = getUsers().find(d => d.__backendId === userId);
-            if (!user) return;
-            document.getElementById('user-modal').classList.remove('hidden');
-            document.getElementById('user-modal-title').textContent = 'Editar Usuario';
-            document.getElementById('modal-user-id').value = userId;
-            document.getElementById('modal-username').value = user.username || '';
-            document.getElementById('modal-password').value = user.password || '';
-            document.getElementById('modal-branch').value = user.branch_name || '';
-            document.getElementById('modal-role').value = user.role || 'empleado';
-        }
-        function closeUserModal() { document.getElementById('user-modal').classList.add('hidden'); }
+        window.limpiarFormularioEmpleado = function () {
+            const casillas = ['maseca-bultos', 'maseca-kilos', 'harimasa-blanca-bultos', 'harimasa-blanca-kilos', 'harimasa-amarilla-bultos', 'harimasa-amarilla-kilos', 'harimasa-fardo-bultos', 'harimasa-fardo-kilos'];
+            casillas.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+            ['papel', 'teflon', 'grafito'].forEach(material => { const radioNo = document.querySelector(`input[name="${material}"][value="no"]`); if (radioNo) radioNo.checked = true; });
+            window.calculateFinalStock();
+            const scroll = document.getElementById('employee-scroll');
+            if (scroll) scroll.scrollTo({ top: 0, behavior: 'smooth' });
+        };
 
-        function openBranchModal() {
-            document.getElementById('branch-modal').classList.remove('hidden');
-            ['modal-branch-id', 'modal-branch-name'].forEach(id => document.getElementById(id).value = '');
-            document.getElementById('modal-initial-bultos').value = 0; document.getElementById('modal-initial-kilos').value = 0;
-            document.getElementById('branch-modal-title').textContent = 'Nueva Sucursal';
-        }
-        function editBranch(branchId) {
-            const branch = getBranches().find(b => b.__backendId === branchId);
-            if (!branch) return;
-            document.getElementById('branch-modal').classList.remove('hidden');
-            document.getElementById('branch-modal-title').textContent = 'Editar Sucursal';
-            document.getElementById('modal-branch-id').value = branchId;
-            document.getElementById('modal-branch-name').value = branch.branch_name || '';
-            document.getElementById('modal-initial-bultos').value = branch.initial_stock_bultos || 0;
-            document.getElementById('modal-initial-kilos').value = branch.initial_stock_kilos || 0;
-        }
-        function closeBranchModal() { document.getElementById('branch-modal').classList.add('hidden'); }
+        // ================= CALENDARIO DE REPORTES (ADMIN) =================
+        window.renderCalendar = function() {
+            const container = document.getElementById('calendar-container');
+            if(!container) return;
+            const year = currentCalendarMonth.getFullYear(); const month = currentCalendarMonth.getMonth();
+            const firstDay = new Date(year, month, 1); const lastDay = new Date(year, month + 1, 0); const startDay = firstDay.getDay();
+            const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            const dayNames = ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa'];
+            const reports = window.getReports().filter(r => r.branch_id === selectedBranchForReport || r.branch_name === selectedBranchForReport);
+            const reportDates = reports.map(r => r.report_date);
 
-        function openRestockModal(branchId) {
-            const branch = getBranches().find(b => b.__backendId === branchId);
-            if (!branch) return;
-            document.getElementById('restock-modal').classList.remove('hidden');
-            document.getElementById('restock-branch-id').value = branchId;
-            document.getElementById('restock-current-stock').innerHTML = `El stock actual es de: <b>${branch.initial_stock_bultos || 0} bultos y ${branch.initial_stock_kilos || 0} kg</b>. Completa las casillas para despachar de bodega a sucursal:`;
-            ['out-maseca-b','out-maseca-k','out-blanca-b','out-blanca-k','out-amarilla-b','out-amarilla-k','out-fardo-b','out-fardo-k'].forEach(id => document.getElementById(id).value = '');
-        }
-        function closeRestockModal() { document.getElementById('restock-modal').classList.add('hidden'); }
-
-        // ================= PANTALLA DE CARGA =================
-        function hideLoadingScreen() {
-            const loader = document.getElementById('loading-screen');
-            const app = document.getElementById('app');
-            app.classList.remove('hidden');
-            loader.classList.add('opacity-0');
-            setTimeout(() => { loader.classList.add('hidden'); }, 700);
-        }
-
-        // ================= EVENT LISTENERS BLINDADOS =================
-        function setupEventListeners() {
-            const clickSafe = (id, fn) => { const el = document.getElementById(id); if(el) el.addEventListener('click', fn); };
-            
-            clickSafe('login-btn', handleLogin);
-            const loginPass = document.getElementById('login-password');
-            if(loginPass) loginPass.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLogin(); });
-
-            clickSafe('admin-logout', logout);
-            clickSafe('employee-logout', logout);
-            clickSafe('mobile-menu-btn', toggleMobileMenu);
-            clickSafe('close-menu-btn', closeMobileMenu);
-            clickSafe('sidebar-overlay', closeMobileMenu);
-
-            document.querySelectorAll('[data-section]').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('[data-section]').forEach(b => b.classList.remove('active', 'bg-amber-100'));
-                    btn.classList.add('active', 'bg-amber-100');
-                    const section = btn.dataset.section;
-                    
-                    const sections = ['users', 'branches', 'reports', 'bodega'];
-                    sections.forEach(sec => {
-                        const el = document.getElementById('section-' + sec);
-                        if(el) el.classList.toggle('hidden', section !== sec);
-                    });
-
-                    if (section === 'bodega' && typeof window.renderBodega === 'function') window.renderBodega();
-                    if (window.innerWidth < 768) closeMobileMenu();
-                });
-            });
-
-            clickSafe('add-user-btn', openUserModal);
-            clickSafe('cancel-user-modal', closeUserModal);
-            clickSafe('save-user-btn', saveUser);
-
-            clickSafe('add-branch-btn', openBranchModal);
-            clickSafe('cancel-branch-modal', closeBranchModal);
-            clickSafe('save-branch-btn', saveBranch);
-
-            const reportBranchSelect = document.getElementById('report-branch-select');
-            if(reportBranchSelect) {
-                reportBranchSelect.addEventListener('change', (e) => {
-                    selectedBranchForReport = e.target.value;
-                    selectedDate = null;
-
-                    if (selectedBranchForReport) {
-                        renderCalendar();
-                        document.getElementById('report-detail').innerHTML = `<div class="text-center text-amber-600 py-12"><i data-lucide="calendar" class="w-16 h-16 mx-auto mb-4 opacity-50"></i><p>Seleccione una fecha para ver el reporte de esta sucursal</p></div>`;
-                    } else {
-                        document.getElementById('calendar-container').innerHTML = '';
-                        document.getElementById('report-detail').innerHTML = `<div class="text-center text-amber-600 py-12"><i data-lucide="calendar" class="w-16 h-16 mx-auto mb-4 opacity-50"></i><p>Seleccione una sucursal y fecha para ver el reporte</p></div>`;
-                    }
-                    lucide.createIcons();
-                });
+            let html = `<div class="flex items-center justify-between mb-4 bg-amber-50 p-2 rounded-xl"><button onclick="window.prevMonth()" class="p-2 hover:bg-amber-200 rounded-lg transition-colors"><i data-lucide="chevron-left" class="w-5 h-5 text-amber-700"></i></button><span class="font-bold text-amber-900">${monthNames[month]} ${year}</span><button onclick="window.nextMonth()" class="p-2 hover:bg-amber-200 rounded-lg transition-colors"><i data-lucide="chevron-right" class="w-5 h-5 text-amber-700"></i></button></div><div class="overflow-x-auto pb-2"><div class="min-w-[240px]"><div class="grid grid-cols-7 gap-1 text-center mb-2">${dayNames.map(d => `<div class="text-[11px] sm:text-xs font-bold text-amber-600 py-1 uppercase">${d}</div>`).join('')}</div><div class="grid grid-cols-7 gap-1">`;
+            for (let i = 0; i < startDay; i++) html += `<div class="p-2"></div>`;
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const hasReport = reportDates.includes(dateStr); const isSelected = selectedDate === dateStr;
+                html += `<button onclick="window.selectDate('${dateStr}')" class="calendar-day aspect-square flex items-center justify-center p-1 sm:p-2 rounded-lg text-xs sm:text-sm font-bold ${hasReport ? 'has-report shadow-sm border border-emerald-200 text-emerald-800' : 'text-amber-800 hover:bg-amber-100'} ${isSelected ? 'selected shadow-md border-transparent' : ''}">${day}</button>`;
             }
-        }
+            html += '</div></div></div>';
+            container.innerHTML = html;
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+        };
 
-        // ================= CRUD REPORTES (ADMIN) =================
-        async function deleteReport(id) {
+        window.prevMonth = function() { currentCalendarMonth.setMonth(currentCalendarMonth.getMonth() - 1); window.renderCalendar(); };
+        window.nextMonth = function() { currentCalendarMonth.setMonth(currentCalendarMonth.getMonth() + 1); window.renderCalendar(); };
+        window.selectDate = function(dateStr) { selectedDate = dateStr; window.renderCalendar(); window.showReportDetail(dateStr); };
+
+        window.showReportDetail = function(dateStr) {
+            const container = document.getElementById('report-detail');
+            if(!container) return;
+            const report = window.getReports().find(r => r.report_date === dateStr && (r.branch_id === selectedBranchForReport || r.branch_name === selectedBranchForReport));
+
+            if (!report) {
+                container.innerHTML = `<div class="text-center text-amber-600 py-12 bg-amber-50 rounded-xl border border-dashed border-amber-200"><i data-lucide="file-x" class="w-16 h-16 mx-auto mb-4 opacity-40"></i><p class="font-semibold">No hay reporte registrado para esta fecha.</p></div>`;
+                if(typeof lucide !== 'undefined') lucide.createIcons();
+                return;
+            }
+
+            const date = new Date(dateStr + 'T12:00:00');
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+            container.innerHTML = `
+            <div class="space-y-6">
+                <div class="border-b border-amber-100 pb-4"><h3 class="text-lg sm:text-xl font-black text-amber-900 capitalize">${date.toLocaleDateString('es-MX', options)}</h3><p class="text-sm text-amber-600 mt-1">Enviado por: <span class="font-bold text-amber-800">${report.submitted_by}</span></p></div>
+                <div class="grid grid-cols-2 gap-3 sm:gap-4"><div class="p-3 bg-amber-50 rounded-xl border border-amber-100"><p class="text-xs text-amber-600 uppercase font-bold mb-1">Existencia Inicial</p><p class="font-black text-amber-900 text-sm sm:text-base">${report.initial_stock_bultos || 0} bts / ${report.initial_stock_kilos || 0} kg</p></div><div class="p-3 bg-green-50 rounded-xl border border-green-100"><p class="text-xs text-green-600 uppercase font-bold mb-1">Existencia Final</p><p class="font-black text-green-900 text-sm sm:text-base">${report.existencia_final_bultos || 0} bts / ${report.existencia_final_kilos || 0} kg</p></div></div>
+                <div class="bg-gray-50 rounded-xl p-4 sm:p-5 border border-gray-100"><h4 class="font-bold text-amber-900 mb-4 border-b border-gray-200 pb-2">Desglose de Consumo</h4><div class="space-y-2.5 text-sm"><div class="flex flex-col sm:flex-row justify-between sm:items-center p-2.5 bg-white rounded-lg shadow-sm border border-gray-50"><span class="font-semibold text-slate-700 mb-1 sm:mb-0">Maseca Premium</span><span class="font-bold text-amber-700">${report.maseca_premium_bultos || 0} bts / ${report.maseca_premium_kilos || 0} kg</span></div><div class="flex flex-col sm:flex-row justify-between sm:items-center p-2.5 bg-white rounded-lg shadow-sm border border-gray-50"><span class="font-semibold text-slate-700 mb-1 sm:mb-0">Harimasa Blanca</span><span class="font-bold text-amber-700">${report.harimasa_blanca_bultos || 0} bts / ${report.harimasa_blanca_kilos || 0} kg</span></div><div class="flex flex-col sm:flex-row justify-between sm:items-center p-2.5 bg-white rounded-lg shadow-sm border border-gray-50"><span class="font-semibold text-slate-700 mb-1 sm:mb-0">Harimasa Amarilla</span><span class="font-bold text-amber-700">${report.harimasa_amarilla_bultos || 0} bts / ${report.harimasa_amarilla_kilos || 0} kg</span></div><div class="flex flex-col sm:flex-row justify-between sm:items-center p-2.5 bg-white rounded-lg shadow-sm border border-gray-50"><span class="font-semibold text-slate-700 mb-1 sm:mb-0">Harimasa Fardo</span><span class="font-bold text-amber-700">${report.harimasa_fardo_bultos || 0} bts / ${report.harimasa_fardo_kilos || 0} kg</span></div></div></div>
+                <div><h4 class="font-bold text-amber-900 mb-3 text-sm">Materiales Solicitados</h4><div class="flex flex-wrap gap-2 text-xs font-bold"><div class="px-3 py-1.5 rounded-full ${report.tiene_papel ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-gray-100 text-gray-500'}">Papel: ${report.tiene_papel ? 'SÍ' : 'NO'}</div><div class="px-3 py-1.5 rounded-full ${report.tiene_teflon ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-gray-100 text-gray-500'}">Teflón: ${report.tiene_teflon ? 'SÍ' : 'NO'}</div><div class="px-3 py-1.5 rounded-full ${report.tiene_grafito ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-gray-100 text-gray-500'}">Grafito: ${report.tiene_grafito ? 'SÍ' : 'NO'}</div></div></div>
+                <div class="mt-6 flex flex-col sm:flex-row gap-3 border-t border-amber-100 pt-5"><button onclick="window.editReport('${report.__backendId}')" class="flex-1 py-2.5 bg-blue-50 text-blue-600 font-bold rounded-xl hover:bg-blue-100 transition-colors flex items-center justify-center gap-2 shadow-sm"><i data-lucide="edit" class="w-4 h-4"></i> Editar</button><button onclick="window.deleteReport('${report.__backendId}')" class="flex-1 py-2.5 bg-red-50 text-red-600 font-bold rounded-xl hover:bg-red-100 transition-colors flex items-center justify-center gap-2 shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i> Eliminar</button><button onclick="window.generarPDF()" class="flex-1 py-2.5 bg-amber-600 text-white font-bold rounded-xl hover:bg-amber-700 transition-colors flex items-center justify-center gap-2 shadow-sm"><i data-lucide="download" class="w-4 h-4"></i> Descargar PDF</button></div>
+            </div>`;
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+        };
+
+        window.deleteReport = async function(id) {
             if (!confirm("¿Estás seguro de que deseas eliminar este reporte?")) return;
             try {
-                const report = getReports().find(r => r.__backendId === id);
-                if (!report) return showToast('Error: Reporte no encontrado', true);
+                const report = window.getReports().find(r => r.__backendId === id);
+                if (!report) return window.showToast('Error: Reporte no encontrado', true);
 
                 const consumedBultos = (report.maseca_premium_bultos || 0) + (report.harimasa_blanca_bultos || 0) + (report.harimasa_amarilla_bultos || 0) + (report.harimasa_fardo_bultos || 0);
                 const consumedKilos = (report.maseca_premium_kilos || 0) + (report.harimasa_blanca_kilos || 0) + (report.harimasa_amarilla_kilos || 0) + (report.harimasa_fardo_kilos || 0);
                 const totalConsumedKilos = (consumedBultos * 20) + consumedKilos;
 
-                const branch = getBranches().find(b => b.branch_name === report.branch_name);
+                const branch = window.getBranches().find(b => b.branch_name === report.branch_name);
                 if (branch && totalConsumedKilos > 0) {
                     const currentBranchKilos = ((branch.initial_stock_bultos || 0) * 20) + (branch.initial_stock_kilos || 0);
                     const newTotalKilos = currentBranchKilos + totalConsumedKilos;
@@ -1398,13 +1519,14 @@
                 }
 
                 await deleteDoc(doc(db, 'reports', id));
-                showToast('Reporte eliminado y stock restaurado');
+                window.showToast('Reporte eliminado y stock restaurado');
                 selectedDate = null;
-                renderCalendar();
-                document.getElementById('report-detail').innerHTML = `<div class="text-center text-amber-600 py-12"><i data-lucide="check-circle" class="w-16 h-16 mx-auto mb-4 opacity-50 text-green-500"></i><p>Reporte eliminado exitosamente.</p></div>`;
-                lucide.createIcons();
-            } catch (e) { showToast('Error al procesar la eliminación', true); }
-        }
+                window.renderCalendar();
+                const dtl = document.getElementById('report-detail');
+                if(dtl) dtl.innerHTML = `<div class="text-center text-amber-600 py-12"><i data-lucide="check-circle" class="w-16 h-16 mx-auto mb-4 opacity-50 text-green-500"></i><p>Reporte eliminado exitosamente.</p></div>`;
+                if(typeof lucide !== 'undefined') lucide.createIcons();
+            } catch (e) { window.showToast('Error al procesar la eliminación', true); }
+        };
 
         window.editCalculateFinalStock = function () {
             const initialBultos = parseInt(document.getElementById('edit-initial-bultos').value) || 0;
@@ -1415,12 +1537,14 @@
             const totalInitialKilos = (initialBultos * 20) + initialKilos;
             const finalKilos = totalInitialKilos - totalConsumedKilos;
 
-            document.getElementById('edit-final-bultos-display').textContent = finalKilos < 0 ? 0 : Math.floor(finalKilos / 20);
-            document.getElementById('edit-final-kilos-display').textContent = finalKilos < 0 ? 0 : finalKilos % 20;
+            const bEl = document.getElementById('edit-final-bultos-display');
+            const kEl = document.getElementById('edit-final-kilos-display');
+            if(bEl) bEl.textContent = finalKilos < 0 ? 0 : Math.floor(finalKilos / 20);
+            if(kEl) kEl.textContent = finalKilos < 0 ? 0 : finalKilos % 20;
         };
 
         window.editReport = function (id) {
-            const report = getReports().find(r => r.__backendId === id);
+            const report = window.getReports().find(r => r.__backendId === id);
             if (!report) return;
             document.getElementById('edit-report-id').value = id;
             document.getElementById('edit-initial-bultos').value = report.initial_stock_bultos || 0;
@@ -1466,64 +1590,56 @@
                     existencia_final_bultos: parseInt(document.getElementById('edit-final-bultos-display').textContent) || 0,
                     existencia_final_kilos: parseInt(document.getElementById('edit-final-kilos-display').textContent) || 0
                 });
-                showToast('Reporte actualizado exitosamente');
+                window.showToast('Reporte actualizado exitosamente');
                 window.closeEditReportModal();
-            } catch (error) { showToast('Error al conectar con la base de datos', true); } 
+            } catch (error) { window.showToast('Error al conectar con la base de datos', true); } 
             finally { btn.innerHTML = 'Actualizar Reporte'; btn.disabled = false; }
         };
 
-        // ================= DESCARGA PDF (REPORTE) =================
+        // ================= PDFS =================
         window.generarPDF = function() {
             try {
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF();
-                const report = getReports().find(r => r.report_date === selectedDate && (r.branch_id === selectedBranchForReport || r.branch_name === selectedBranchForReport));
-                if(!report) return showToast("No hay reporte seleccionado", true);
+                const { jsPDF } = window.jspdf; const pdf = new jsPDF();
+                const report = window.getReports().find(r => r.report_date === selectedDate && (r.branch_id === selectedBranchForReport || r.branch_name === selectedBranchForReport));
+                if(!report) return window.showToast("No hay reporte seleccionado", true);
 
                 pdf.setFontSize(22); pdf.setTextColor(217, 119, 6); pdf.text("XAVI", 105, 20, { align: "center" });
                 pdf.setFontSize(16); pdf.setTextColor(0, 0, 0); pdf.text("Reporte Diario de Consumo", 105, 30, { align: "center" });
                 pdf.setFontSize(12); pdf.text(`Sucursal: ${report.branch_name}`, 20, 45); pdf.text(`Fecha: ${report.report_date}`, 20, 52); pdf.text(`Enviado por: ${report.submitted_by}`, 20, 59);
-
                 pdf.setFontSize(14); pdf.setTextColor(217, 119, 6); pdf.text("Estado de Inventario", 20, 75);
                 pdf.setFontSize(12); pdf.setTextColor(0, 0, 0);
                 pdf.text(`Existencia Inicial: ${report.initial_stock_bultos} bts / ${report.initial_stock_kilos} kg`, 25, 83);
                 pdf.text(`Existencia Final: ${report.existencia_final_bultos} bts / ${report.existencia_final_kilos} kg`, 25, 90);
-
                 pdf.setFontSize(14); pdf.setTextColor(217, 119, 6); pdf.text("Desglose de Consumo", 20, 105);
                 pdf.setFontSize(12); pdf.setTextColor(0, 0, 0);
                 pdf.text(`- Maseca Premium: ${report.maseca_premium_bultos} bts / ${report.maseca_premium_kilos} kg`, 25, 113);
                 pdf.text(`- Harimasa Blanca: ${report.harimasa_blanca_bultos} bts / ${report.harimasa_blanca_kilos} kg`, 25, 120);
                 pdf.text(`- Harimasa Amarilla: ${report.harimasa_amarilla_bultos} bts / ${report.harimasa_amarilla_kilos} kg`, 25, 127);
                 pdf.text(`- Harimasa Fardo: ${report.harimasa_fardo_bultos} bts / ${report.harimasa_fardo_kilos} kg`, 25, 134);
-
                 pdf.setFontSize(14); pdf.setTextColor(217, 119, 6); pdf.text("Materiales Solicitados", 20, 150);
                 pdf.setFontSize(12); pdf.setTextColor(0, 0, 0);
                 pdf.text(`Papel: ${report.tiene_papel ? 'SÍ' : 'NO'}`, 25, 158);
                 pdf.text(`Teflón: ${report.tiene_teflon ? 'SÍ' : 'NO'}`, 25, 165);
                 pdf.text(`Grafito: ${report.tiene_grafito ? 'SÍ' : 'NO'}`, 25, 172);
-
                 pdf.setLineWidth(0.5); pdf.line(65, 230, 145, 230); pdf.setFontSize(12); pdf.text("Firma del Encargado de Sucursal", 105, 238, { align: "center" });
                 pdf.save(`Reporte_${report.report_date}.pdf`);
             } catch(e) { alert("Error crítico: " + e.message); }
         };
 
-        // ================= DESCARGA PDF (SUCURSALES NATIVO) =================
         window.descargarReporteSucursal = function(branchId, tipo) {
             try {
-                const branch = getBranches().find(b => b.__backendId === branchId);
+                const branch = window.getBranches().find(b => b.__backendId === branchId);
                 if (!branch) return;
-
                 const hoy = new Date(); let fechaInicio = new Date(); let tituloStr = "";
                 if (tipo === 'semanal') { fechaInicio.setDate(hoy.getDate() - 7); tituloStr = "Resumen de Consumo Semanal"; } 
                 else { fechaInicio.setDate(hoy.getDate() - 30); tituloStr = "Resumen de Consumo Mensual"; }
 
-                const reportesSucursal = getReports().filter(r => {
+                const reportesSucursal = window.getReports().filter(r => {
                     if (r.branch_id !== branch.branch_name && r.branch_name !== branch.branch_name) return false;
                     const rDate = new Date(r.report_date + 'T12:00:00'); return rDate >= fechaInicio && rDate <= hoy;
                 });
-
-                if (reportesSucursal.length === 0) return showToast(`No hay reportes capturados.`, true);
-                showToast("Generando PDF...");
+                if (reportesSucursal.length === 0) return window.showToast(`No hay reportes capturados.`, true);
+                window.showToast("Generando PDF...");
 
                 let totMaseca = 0, totBlanca = 0, totAmarilla = 0, totFardo = 0;
                 reportesSucursal.forEach(r => {
@@ -1542,7 +1658,6 @@
                 pdf.setFontSize(24); pdf.setTextColor(217, 119, 6); pdf.text("XAVI", 105, 20, { align: "center" });
                 pdf.setFontSize(16); pdf.setTextColor(0, 0, 0); pdf.text(tituloStr, 105, 30, { align: "center" });
                 pdf.setFontSize(12); pdf.text(`Sucursal: ${branch.branch_name}`, 20, 45); pdf.text(`Periodo: ${fechaIniStr} al ${fechaFinStr}`, 20, 52);
-
                 pdf.setFontSize(14); pdf.setTextColor(217, 119, 6); pdf.text("Desglose de Consumo Total", 20, 70);
                 pdf.setTextColor(0, 0, 0); pdf.setFontSize(12);
                 
@@ -1554,22 +1669,64 @@
                 pdf.text("Harimasa Fardo", 25, 134); pdf.text(`${Math.floor(totFardo/20)} bts / ${totFardo%20} kg`, 130, 134); linea(139);
 
                 pdf.setFont(undefined, 'bold'); pdf.text("SUMA GLOBAL", 25, 148); pdf.text(`${Math.floor(totalGlobalKilos/20)} bultos / ${totalGlobalKilos%20} kilos`, 130, 148); pdf.setFont(undefined, 'normal'); linea(153);
-
                 pdf.setFontSize(14); pdf.setTextColor(21, 128, 61); pdf.text("Estado Actual del Inventario", 20, 175);
                 pdf.setFontSize(12); pdf.setTextColor(0, 0, 0); pdf.text(`Existencia reportada al sistema: ${branch.initial_stock_bultos || 0} bts / ${branch.initial_stock_kilos || 0} kg`, 25, 183);
-
                 pdf.setLineWidth(0.5); pdf.line(65, 230, 145, 230); pdf.text("Firma del Encargado de Sucursal", 105, 238, { align: "center" });
                 pdf.save(`Resumen_${tipo}_${branch.branch_name.replace(/\s+/g, '_')}.pdf`);
             } catch (error) { alert("Error crítico: " + error.message); }
         };
 
-        window.deleteReport = deleteReport;
-        window.editReport = editReport;
-        window.closeEditReportModal = closeEditReportModal;
-        window.saveEditReport = saveEditReport;
+        // ================= EVENT LISTENERS =================
+        window.setupEventListeners = function() {
+            const clickSafe = (id, fn) => { const el = document.getElementById(id); if(el) el.addEventListener('click', fn); };
+            clickSafe('login-btn', window.handleLogin);
+            const lp = document.getElementById('login-password'); if(lp) lp.addEventListener('keypress', (e) => { if (e.key === 'Enter') window.handleLogin(); });
+            clickSafe('admin-logout', window.logout); clickSafe('employee-logout', window.logout);
+            clickSafe('mobile-menu-btn', window.toggleMobileMenu); clickSafe('close-menu-btn', window.closeMobileMenu); clickSafe('sidebar-overlay', window.closeMobileMenu);
+
+            document.querySelectorAll('[data-section]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('[data-section]').forEach(b => b.classList.remove('active', 'bg-amber-100'));
+                    btn.classList.add('active', 'bg-amber-100');
+                    const section = btn.dataset.section;
+                    const sections = ['users', 'branches', 'reports', 'bodega'];
+                    sections.forEach(sec => {
+                        const el = document.getElementById('section-' + sec);
+                        if(el) el.classList.toggle('hidden', section !== sec);
+                    });
+                    if (section === 'bodega' && typeof window.renderBodega === 'function') window.renderBodega();
+                    if (window.innerWidth < 768) window.closeMobileMenu();
+                });
+            });
+
+            clickSafe('add-user-btn', window.openUserModal); clickSafe('cancel-user-modal', window.closeUserModal); clickSafe('save-user-btn', window.saveUser);
+            clickSafe('add-branch-btn', window.openBranchModal); clickSafe('cancel-branch-modal', window.closeBranchModal); clickSafe('save-branch-btn', window.saveBranch);
+
+            const rbs = document.getElementById('report-branch-select');
+            if(rbs) {
+                rbs.addEventListener('change', (e) => {
+                    selectedBranchForReport = e.target.value; selectedDate = null;
+                    if (selectedBranchForReport) {
+                        window.renderCalendar();
+                        document.getElementById('report-detail').innerHTML = `<div class="text-center text-amber-600 py-12"><i data-lucide="calendar" class="w-16 h-16 mx-auto mb-4 opacity-50"></i><p>Seleccione una fecha para ver el reporte de esta sucursal</p></div>`;
+                    } else {
+                        document.getElementById('calendar-container').innerHTML = '';
+                        document.getElementById('report-detail').innerHTML = `<div class="text-center text-amber-600 py-12"><i data-lucide="calendar" class="w-16 h-16 mx-auto mb-4 opacity-50"></i><p>Seleccione una sucursal y fecha para ver el reporte</p></div>`;
+                    }
+                    if(typeof lucide !== 'undefined') lucide.createIcons();
+                });
+            }
+        };
+
+        window.hideLoadingScreen = function() {
+            const loader = document.getElementById('loading-screen');
+            const app = document.getElementById('app');
+            if(app) app.classList.remove('hidden');
+            if(loader) { loader.classList.add('opacity-0'); setTimeout(() => { loader.classList.add('hidden'); }, 700); }
+        };
 
         init();
-        window.addEventListener('load', () => { setTimeout(hideLoadingScreen, 1500); });
+        window.addEventListener('load', () => { setTimeout(window.hideLoadingScreen, 1500); });
     </script>
 </body>
 </html>
