@@ -1502,30 +1502,70 @@
         };
 
         window.deleteReport = async function(id) {
-            if (!confirm("¿Estás seguro de que deseas eliminar este reporte?")) return;
+            if (!confirm("¿Estás seguro de que deseas eliminar este reporte? Toda la harina consumida será devuelta a la sucursal.")) return;
+            
             try {
+                // 1. Buscamos el reporte ANTES de eliminarlo
                 const report = window.getReports().find(r => r.__backendId === id);
                 if (!report) return window.showToast('Error: Reporte no encontrado', true);
 
-                const consumedBultos = (report.maseca_premium_bultos || 0) + (report.harimasa_blanca_bultos || 0) + (report.harimasa_amarilla_bultos || 0) + (report.harimasa_fardo_bultos || 0);
-                const consumedKilos = (report.maseca_premium_kilos || 0) + (report.harimasa_blanca_kilos || 0) + (report.harimasa_amarilla_kilos || 0) + (report.harimasa_fardo_kilos || 0);
-                const totalConsumedKilos = (consumedBultos * 20) + consumedKilos;
+                // 2. Búsqueda blindada de la sucursal (A prueba de espacios o mayúsculas)
+                const reportBranchName = String(report.branch_name || '').trim().toLowerCase();
+                const branch = window.getBranches().find(b => 
+                    String(b.branch_name || '').trim().toLowerCase() === reportBranchName || 
+                    b.__backendId === report.branch_id
+                );
 
-                const branch = window.getBranches().find(b => b.branch_name === report.branch_name);
-                if (branch && totalConsumedKilos > 0) {
+                if (branch) {
+                    // Cantidades que el empleado había reportado como "consumidas"
+                    const cMasB = report.maseca_premium_bultos || 0, cMasK = report.maseca_premium_kilos || 0;
+                    const cBlaB = report.harimasa_blanca_bultos || 0, cBlaK = report.harimasa_blanca_kilos || 0;
+                    const cAmaB = report.harimasa_amarilla_bultos || 0, cAmaK = report.harimasa_amarilla_kilos || 0;
+                    const cFarB = report.harimasa_fardo_bultos || 0, cFarK = report.harimasa_fardo_kilos || 0;
+
+                    // Función matemática para devolver bultos y kilos exactos
+                    const sumF = (b1, k1, b2, k2) => {
+                        let t = ((b1||0)*20 + (k1||0)) + ((b2||0)*20 + (k2||0));
+                        return { b: Math.floor(t/20), k: t%20 };
+                    };
+
+                    // Devolvemos la harina a los casilleros de cada tipo en la sucursal
+                    const fMas = sumF(branch.b_mas_b, branch.b_mas_k, cMasB, cMasK);
+                    const fBla = sumF(branch.b_bla_b, branch.b_bla_k, cBlaB, cBlaK);
+                    const fAma = sumF(branch.b_ama_b, branch.b_ama_k, cAmaB, cAmaK);
+                    const fFar = sumF(branch.b_far_b, branch.b_far_k, cFarB, cFarK);
+
+                    // Devolvemos el global de kilos de la sucursal
+                    const totalConsumedKilos = (cMasB*20 + cMasK) + (cBlaB*20 + cBlaK) + (cAmaB*20 + cAmaK) + (cFarB*20 + cFarK);
                     const currentBranchKilos = ((branch.initial_stock_bultos || 0) * 20) + (branch.initial_stock_kilos || 0);
                     const newTotalKilos = currentBranchKilos + totalConsumedKilos;
-                    await updateDoc(doc(db, 'branches', branch.__backendId), { initial_stock_bultos: Math.floor(newTotalKilos / 20), initial_stock_kilos: newTotalKilos % 20 });
+
+                    // 3. Enviamos la devolución a Firebase para que el empleado lo vea al instante
+                    await updateDoc(doc(db, 'branches', branch.__backendId), { 
+                        initial_stock_bultos: Math.floor(newTotalKilos / 20), 
+                        initial_stock_kilos: newTotalKilos % 20,
+                        b_mas_b: fMas.b, b_mas_k: fMas.k,
+                        b_bla_b: fBla.b, b_bla_k: fBla.k,
+                        b_ama_b: fAma.b, b_ama_k: fAma.k,
+                        b_far_b: fFar.b, b_far_k: fFar.k
+                    });
                 }
 
+                // 4. Ahora sí, destruimos el reporte definitivamente
                 await deleteDoc(doc(db, 'reports', id));
-                window.showToast('Reporte eliminado y stock restaurado');
+                
+                window.showToast('Reporte eliminado y stock devuelto a la sucursal');
                 selectedDate = null;
                 window.renderCalendar();
+                
                 const dtl = document.getElementById('report-detail');
-                if(dtl) dtl.innerHTML = `<div class="text-center text-amber-600 py-12"><i data-lucide="check-circle" class="w-16 h-16 mx-auto mb-4 opacity-50 text-green-500"></i><p>Reporte eliminado exitosamente.</p></div>`;
+                if(dtl) dtl.innerHTML = `<div class="text-center text-green-600 py-12"><i data-lucide="check-circle" class="w-16 h-16 mx-auto mb-4 opacity-50 text-green-500"></i><p class="font-bold">Reporte anulado exitosamente.</p><p class="text-sm mt-1 text-green-700">El stock fue devuelto al inventario de la sucursal.</p></div>`;
                 if(typeof lucide !== 'undefined') lucide.createIcons();
-            } catch (e) { window.showToast('Error al procesar la eliminación', true); }
+                
+            } catch (e) { 
+                console.error(e);
+                window.showToast('Error al procesar la eliminación', true); 
+            }
         };
 
         window.editCalculateFinalStock = function () {
@@ -1572,28 +1612,103 @@
         window.saveEditReport = async function () {
             const id = document.getElementById('edit-report-id').value;
             if (!id) return;
+            
+            // 1. Obtener el reporte viejo ANTES de sobrescribirlo
+            const oldReport = window.getReports().find(r => r.__backendId === id);
+            if (!oldReport) return window.showToast("Error: No se encontró el reporte original", true);
+
+            // 2. Buscar la sucursal a la que le pertenece el reporte
+            const branch = window.getBranches().find(b => b.branch_name === oldReport.branch_name || b.__backendId === oldReport.branch_id);
+            if (!branch) return window.showToast("Error: No se encontró la sucursal", true);
+
             const btn = document.getElementById('save-edit-report-btn');
-            btn.innerHTML = '<i class="lucide-loader animate-spin inline w-4 h-4 mr-2"></i> Actualizando...'; btn.disabled = true;
+            if(btn) { btn.innerHTML = '<i class="lucide-loader animate-spin inline w-4 h-4 mr-2"></i> Sincronizando...'; btn.disabled = true; }
+
             try {
-                await updateDoc(doc(db, 'reports', id), {
-                    maseca_premium_bultos: parseInt(document.getElementById('edit-maseca-bultos').value) || 0,
-                    maseca_premium_kilos: parseInt(document.getElementById('edit-maseca-kilos').value) || 0,
-                    harimasa_blanca_bultos: parseInt(document.getElementById('edit-blanca-bultos').value) || 0,
-                    harimasa_blanca_kilos: parseInt(document.getElementById('edit-blanca-kilos').value) || 0,
-                    harimasa_amarilla_bultos: parseInt(document.getElementById('edit-amarilla-bultos').value) || 0,
-                    harimasa_amarilla_kilos: parseInt(document.getElementById('edit-amarilla-kilos').value) || 0,
-                    harimasa_fardo_bultos: parseInt(document.getElementById('edit-fardo-bultos').value) || 0,
-                    harimasa_fardo_kilos: parseInt(document.getElementById('edit-fardo-kilos').value) || 0,
-                    tiene_papel: document.querySelector('input[name="edit_papel"]:checked')?.value === 'si',
-                    tiene_teflon: document.querySelector('input[name="edit_teflon"]:checked')?.value === 'si',
-                    tiene_grafito: document.querySelector('input[name="edit_grafito"]:checked')?.value === 'si',
-                    existencia_final_bultos: parseInt(document.getElementById('edit-final-bultos-display').textContent) || 0,
-                    existencia_final_kilos: parseInt(document.getElementById('edit-final-kilos-display').textContent) || 0
+                const getVal = (elId) => parseInt(document.getElementById(elId).value) || 0;
+                
+                // Valores NUEVOS (Lo que acabas de escribir en el modal)
+                const nMasB = getVal('edit-maseca-bultos'), nMasK = getVal('edit-maseca-kilos');
+                const nBlaB = getVal('edit-blanca-bultos'), nBlaK = getVal('edit-blanca-kilos');
+                const nAmaB = getVal('edit-amarilla-bultos'), nAmaK = getVal('edit-amarilla-kilos');
+                const nFarB = getVal('edit-fardo-bultos'), nFarK = getVal('edit-fardo-kilos');
+
+                // Valores VIEJOS (Lo que reportó el empleado originalmente)
+                const oMasB = oldReport.maseca_premium_bultos || 0, oMasK = oldReport.maseca_premium_kilos || 0;
+                const oBlaB = oldReport.harimasa_blanca_bultos || 0, oBlaK = oldReport.harimasa_blanca_kilos || 0;
+                const oAmaB = oldReport.harimasa_amarilla_bultos || 0, oAmaK = oldReport.harimasa_amarilla_kilos || 0;
+                const oFarB = oldReport.harimasa_fardo_bultos || 0, oFarK = oldReport.harimasa_fardo_kilos || 0;
+
+                // 3. MATEMÁTICA: Diferencia (Delta) = Consumo Nuevo - Consumo Viejo
+                const calcD = (oB, oK, nB, nK) => ((nB||0)*20 + (nK||0)) - ((oB||0)*20 + (oK||0));
+                
+                const dMas = calcD(oMasB, oMasK, nMasB, nMasK);
+                const dBla = calcD(oBlaB, oBlaK, nBlaB, nBlaK);
+                const dAma = calcD(oAmaB, oAmaK, nAmaB, nAmaK);
+                const dFar = calcD(oFarB, oFarK, nFarB, nFarK);
+
+                const totalDeltaKilos = dMas + dBla + dAma + dFar;
+
+                // 4. ACTUALIZAR LA SUCURSAL: Restamos la diferencia a la sucursal.
+                // (Si editaste para consumir MENOS, la diferencia es negativa, así que se le SUMARÁ a la sucursal).
+                const currentBranchKilos = ((branch.initial_stock_bultos || 0) * 20) + (branch.initial_stock_kilos || 0);
+                const newBranchKilos = Math.max(0, currentBranchKilos - totalDeltaKilos);
+
+                const aplD = (cB, cK, delta) => {
+                    let t = ((cB||0)*20 + (cK||0)) - delta; 
+                    return { b: Math.max(0, Math.floor(t/20)), k: Math.max(0, t%20) };
+                };
+                
+                const fMas = aplD(branch.b_mas_b, branch.b_mas_k, dMas);
+                const fBla = aplD(branch.b_bla_b, branch.b_bla_k, dBla);
+                const fAma = aplD(branch.b_ama_b, branch.b_ama_k, dAma);
+                const fFar = aplD(branch.b_far_b, branch.b_far_k, dFar);
+
+                // PASO A: Se guarda el stock corregido directo a la sucursal para que el empleado lo vea
+                await updateDoc(doc(db, 'branches', branch.__backendId), {
+                    initial_stock_bultos: Math.floor(newBranchKilos / 20),
+                    initial_stock_kilos: newBranchKilos % 20,
+                    b_mas_b: fMas.b, b_mas_k: fMas.k,
+                    b_bla_b: fBla.b, b_bla_k: fBla.k,
+                    b_ama_b: fAma.b, b_ama_k: fAma.k,
+                    b_far_b: fFar.b, b_far_k: fFar.k
                 });
-                window.showToast('Reporte actualizado exitosamente');
+
+                // PASO B: Actualizar los números en el ticket del Reporte
+                const chkPapel = document.querySelector('input[name="edit_papel"]:checked');
+                const chkTeflon = document.querySelector('input[name="edit_teflon"]:checked');
+                const chkGrafito = document.querySelector('input[name="edit_grafito"]:checked');
+
+                const exFinalB = parseInt(document.getElementById('edit-final-bultos-display').textContent) || 0;
+                const exFinalK = parseInt(document.getElementById('edit-final-kilos-display').textContent) || 0;
+
+                await updateDoc(doc(db, 'reports', id), {
+                    maseca_premium_bultos: nMasB, maseca_premium_kilos: nMasK,
+                    harimasa_blanca_bultos: nBlaB, harimasa_blanca_kilos: nBlaK,
+                    harimasa_amarilla_bultos: nAmaB, harimasa_amarilla_kilos: nAmaK,
+                    harimasa_fardo_bultos: nFarB, harimasa_fardo_kilos: nFarK,
+                    tiene_papel: chkPapel ? chkPapel.value === 'si' : false,
+                    tiene_teflon: chkTeflon ? chkTeflon.value === 'si' : false,
+                    tiene_grafito: chkGrafito ? chkGrafito.value === 'si' : false,
+                    existencia_final_bultos: exFinalB,
+                    existencia_final_kilos: exFinalK
+                });
+
+                window.showToast('Reporte editado y sucursal actualizada exitosamente');
                 window.closeEditReportModal();
-            } catch (error) { window.showToast('Error al conectar con la base de datos', true); } 
-            finally { btn.innerHTML = 'Actualizar Reporte'; btn.disabled = false; }
+                
+                // Refrescar el cuadro de la vista actual
+                if (selectedDate) {
+                    window.renderCalendar();
+                    window.showReportDetail(selectedDate);
+                }
+
+            } catch (error) { 
+                window.showToast('Error al conectar con la base de datos', true); 
+                console.error(error);
+            } finally { 
+                if(btn) { btn.innerHTML = 'Actualizar Reporte'; btn.disabled = false; } 
+            }
         };
 
         // ================= PDFS =================
