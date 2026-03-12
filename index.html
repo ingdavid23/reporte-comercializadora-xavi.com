@@ -155,15 +155,20 @@
                     </div>
 
                     <div id="section-bodega" class="hidden p-4 sm:p-8">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                        <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4">
                             <h2 class="text-2xl font-black text-amber-900 flex items-center gap-2"><i data-lucide="warehouse" class="w-6 h-6"></i> Bodega Principal</h2>
                             
-                            <div class="flex gap-2 w-full sm:w-auto">
-                                <button onclick="window.openEditBodega()" class="w-full sm:w-auto px-4 py-2.5 rounded-xl text-amber-800 bg-amber-100 hover:bg-amber-200 font-bold flex justify-center items-center gap-2 shadow-sm transition-colors">
-                                    <i data-lucide="edit" class="w-5 h-5"></i> Editar Stock
+                            <div class="flex flex-wrap gap-2 w-full xl:w-auto">
+                                <button onclick="window.resetBodega()" class="w-full sm:w-auto px-4 py-2.5 rounded-xl text-red-700 bg-red-50 hover:bg-red-100 font-bold flex justify-center items-center gap-2 shadow-sm transition-colors border border-red-200">
+                                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reiniciar
                                 </button>
+
+                                <button onclick="window.openEditBodega()" class="w-full sm:w-auto px-4 py-2.5 rounded-xl text-amber-800 bg-amber-100 hover:bg-amber-200 font-bold flex justify-center items-center gap-2 shadow-sm transition-colors">
+                                    <i data-lucide="edit" class="w-4 h-4"></i> Editar Stock
+                                </button>
+                                
                                 <button onclick="window.openEntradaBodega()" class="btn-primary w-full sm:w-auto px-5 py-2.5 rounded-xl text-white font-bold flex justify-center items-center gap-2 shadow-md hover:shadow-lg">
-                                    <i data-lucide="package-plus" class="w-5 h-5"></i> Registrar Entrada
+                                    <i data-lucide="package-plus" class="w-4 h-4"></i> Registrar Entrada
                                 </button>
                             </div>
                         </div>
@@ -1158,6 +1163,38 @@
                 document.getElementById('edit-bodega-modal').classList.add('hidden');
             } catch(e) { alert("Error: " + e.message); } 
             finally { btn.innerHTML = 'Guardar Stock Exacto'; btn.disabled = false; }
+        };
+
+
+        // ================= REINICIAR BODEGA =================
+        window.resetBodega = async function() {
+            if (!confirm("⚠️ ¡ADVERTENCIA! ¿Estás seguro de que deseas reiniciar TODA la Bodega Principal a CERO? \n\nEsta acción eliminará el stock actual de todas las harinas y no se puede deshacer.")) return;
+            
+            try {
+                // 1. Poner todo en cero en Firebase
+                await setDoc(doc(db, 'bodega', 'main'), { 
+                    maseca_bultos: 0, maseca_kilos: 0, 
+                    blanca_bultos: 0, blanca_kilos: 0, 
+                    amarilla_bultos: 0, amarilla_kilos: 0, 
+                    fardo_bultos: 0, fardo_kilos: 0 
+                });
+
+                // 2. Dejar un registro histórico del reinicio
+                await addDoc(collection(db, 'bodega_movements'), { 
+                    type: 'ajuste', 
+                    date: new Date().toISOString(), 
+                    user: currentUser.username, 
+                    branch_name: '⚠️ REINICIO TOTAL DE BODEGA A CERO',
+                    maseca_bultos: 0, maseca_kilos: 0, 
+                    blanca_bultos: 0, blanca_kilos: 0, 
+                    amarilla_bultos: 0, amarilla_kilos: 0, 
+                    fardo_bultos: 0, fardo_kilos: 0
+                });
+
+                window.showToast('¡Bodega reiniciada a cero exitosamente!');
+            } catch(e) { 
+                alert("Error al reiniciar la bodega: " + e.message); 
+            }
         };
         window.openEntradaBodega = function() {
             ['in-maseca-b','in-maseca-k','in-blanca-b','in-blanca-k','in-amarilla-b','in-amarilla-k','in-fardo-b','in-fardo-k'].forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
