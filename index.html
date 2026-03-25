@@ -1524,6 +1524,15 @@
                 return;
             }
 
+            // 🔥 MATEMÁTICA DE DINERO 🔥
+            const consumedBultos = (report.maseca_premium_bultos || 0) + (report.harimasa_blanca_bultos || 0) + (report.harimasa_amarilla_bultos || 0) + (report.harimasa_fardo_bultos || 0);
+            const consumedKilos = (report.maseca_premium_kilos || 0) + (report.harimasa_blanca_kilos || 0) + (report.harimasa_amarilla_kilos || 0) + (report.harimasa_fardo_kilos || 0);
+            
+            // 1 Bulto = 41 kg tortilla | 1 kg harina = 2.05 kg tortilla
+            const kilosTortilla = (consumedBultos * 41) + (consumedKilos * 2.05);
+            const dineroTotal = kilosTortilla * 24;
+            const dineroFormateado = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(dineroTotal);
+
             const date = new Date(dateStr + 'T12:00:00');
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
@@ -1531,7 +1540,25 @@
             <div class="space-y-6">
                 <div class="border-b border-amber-100 pb-4"><h3 class="text-lg sm:text-xl font-black text-amber-900 capitalize">${date.toLocaleDateString('es-MX', options)}</h3><p class="text-sm text-amber-600 mt-1">Enviado por: <span class="font-bold text-amber-800">${report.submitted_by}</span></p></div>
                 <div class="grid grid-cols-2 gap-3 sm:gap-4"><div class="p-3 bg-amber-50 rounded-xl border border-amber-100"><p class="text-xs text-amber-600 uppercase font-bold mb-1">Existencia Inicial</p><p class="font-black text-amber-900 text-sm sm:text-base">${report.initial_stock_bultos || 0} bts / ${report.initial_stock_kilos || 0} kg</p></div><div class="p-3 bg-green-50 rounded-xl border border-green-100"><p class="text-xs text-green-600 uppercase font-bold mb-1">Existencia Final</p><p class="font-black text-green-900 text-sm sm:text-base">${report.existencia_final_bultos || 0} bts / ${report.existencia_final_kilos || 0} kg</p></div></div>
-                <div class="bg-gray-50 rounded-xl p-4 sm:p-5 border border-gray-100"><h4 class="font-bold text-amber-900 mb-4 border-b border-gray-200 pb-2">Desglose de Consumo</h4><div class="space-y-2.5 text-sm"><div class="flex flex-col sm:flex-row justify-between sm:items-center p-2.5 bg-white rounded-lg shadow-sm border border-gray-50"><span class="font-semibold text-slate-700 mb-1 sm:mb-0">Maseca Premium</span><span class="font-bold text-amber-700">${report.maseca_premium_bultos || 0} bts / ${report.maseca_premium_kilos || 0} kg</span></div><div class="flex flex-col sm:flex-row justify-between sm:items-center p-2.5 bg-white rounded-lg shadow-sm border border-gray-50"><span class="font-semibold text-slate-700 mb-1 sm:mb-0">Harimasa Blanca</span><span class="font-bold text-amber-700">${report.harimasa_blanca_bultos || 0} bts / ${report.harimasa_blanca_kilos || 0} kg</span></div><div class="flex flex-col sm:flex-row justify-between sm:items-center p-2.5 bg-white rounded-lg shadow-sm border border-gray-50"><span class="font-semibold text-slate-700 mb-1 sm:mb-0">Harimasa Amarilla</span><span class="font-bold text-amber-700">${report.harimasa_amarilla_bultos || 0} bts / ${report.harimasa_amarilla_kilos || 0} kg</span></div><div class="flex flex-col sm:flex-row justify-between sm:items-center p-2.5 bg-white rounded-lg shadow-sm border border-gray-50"><span class="font-semibold text-slate-700 mb-1 sm:mb-0">Harimasa Fardo</span><span class="font-bold text-amber-700">${report.harimasa_fardo_bultos || 0} bts / ${report.harimasa_fardo_kilos || 0} kg</span></div></div></div>
+                <div class="bg-gray-50 rounded-xl p-4 sm:p-5 border border-gray-100">
+                    <h4 class="font-bold text-amber-900 mb-4 border-b border-gray-200 pb-2">Desglose de Consumo</h4>
+                    <div class="space-y-2.5 text-sm">
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center p-2.5 bg-white rounded-lg shadow-sm border border-gray-50"><span class="font-semibold text-slate-700 mb-1 sm:mb-0">Maseca Premium</span><span class="font-bold text-amber-700">${report.maseca_premium_bultos || 0} bts / ${report.maseca_premium_kilos || 0} kg</span></div>
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center p-2.5 bg-white rounded-lg shadow-sm border border-gray-50"><span class="font-semibold text-slate-700 mb-1 sm:mb-0">Harimasa Blanca</span><span class="font-bold text-amber-700">${report.harimasa_blanca_bultos || 0} bts / ${report.harimasa_blanca_kilos || 0} kg</span></div>
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center p-2.5 bg-white rounded-lg shadow-sm border border-gray-50"><span class="font-semibold text-slate-700 mb-1 sm:mb-0">Harimasa Amarilla</span><span class="font-bold text-amber-700">${report.harimasa_amarilla_bultos || 0} bts / ${report.harimasa_amarilla_kilos || 0} kg</span></div>
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center p-2.5 bg-white rounded-lg shadow-sm border border-gray-50"><span class="font-semibold text-slate-700 mb-1 sm:mb-0">Harimasa Fardo</span><span class="font-bold text-amber-700">${report.harimasa_fardo_bultos || 0} bts / ${report.harimasa_fardo_kilos || 0} kg</span></div>
+                    </div>
+                    
+                    <div class="mt-4 p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-2 shadow-sm">
+                        <div>
+                            <h4 class="font-bold text-emerald-900 flex items-center justify-center sm:justify-start gap-1.5"><i data-lucide="circle-dollar-sign" class="w-5 h-5"></i> Equivalencia en Dinero</h4>
+                            <p class="text-[11px] text-emerald-700 mt-0.5 text-center sm:text-left">Aprox. ${kilosTortilla.toFixed(2)} kg de tortilla a $24/kg</p>
+                        </div>
+                        <div class="text-2xl sm:text-3xl font-black text-emerald-800">
+                            ${dineroFormateado}
+                        </div>
+                    </div>
+                </div>
                 <div><h4 class="font-bold text-amber-900 mb-3 text-sm">Materiales Solicitados</h4><div class="flex flex-wrap gap-2 text-xs font-bold"><div class="px-3 py-1.5 rounded-full ${report.tiene_papel ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-gray-100 text-gray-500'}">Papel: ${report.tiene_papel ? 'SÍ' : 'NO'}</div><div class="px-3 py-1.5 rounded-full ${report.tiene_teflon ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-gray-100 text-gray-500'}">Teflón: ${report.tiene_teflon ? 'SÍ' : 'NO'}</div><div class="px-3 py-1.5 rounded-full ${report.tiene_grafito ? 'bg-green-100 text-green-800 border border-green-200' : 'bg-gray-100 text-gray-500'}">Grafito: ${report.tiene_grafito ? 'SÍ' : 'NO'}</div></div></div>
                 <div class="mt-6 flex flex-col sm:flex-row gap-3 border-t border-amber-100 pt-5"><button onclick="window.editReport('${report.__backendId}')" class="flex-1 py-2.5 bg-blue-50 text-blue-600 font-bold rounded-xl hover:bg-blue-100 transition-colors flex items-center justify-center gap-2 shadow-sm"><i data-lucide="edit" class="w-4 h-4"></i> Editar</button><button onclick="window.deleteReport('${report.__backendId}')" class="flex-1 py-2.5 bg-red-50 text-red-600 font-bold rounded-xl hover:bg-red-100 transition-colors flex items-center justify-center gap-2 shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i> Eliminar</button><button onclick="window.generarPDF()" class="flex-1 py-2.5 bg-amber-600 text-white font-bold rounded-xl hover:bg-amber-700 transition-colors flex items-center justify-center gap-2 shadow-sm"><i data-lucide="download" class="w-4 h-4"></i> Descargar PDF</button></div>
             </div>`;
@@ -1755,25 +1782,44 @@
                 const report = window.getReports().find(r => r.report_date === selectedDate && (r.branch_id === selectedBranchForReport || r.branch_name === selectedBranchForReport));
                 if(!report) return window.showToast("No hay reporte seleccionado", true);
 
+                // 🔥 MATEMÁTICA DE DINERO PARA EL PDF 🔥
+                const consumedBultos = (report.maseca_premium_bultos || 0) + (report.harimasa_blanca_bultos || 0) + (report.harimasa_amarilla_bultos || 0) + (report.harimasa_fardo_bultos || 0);
+                const consumedKilos = (report.maseca_premium_kilos || 0) + (report.harimasa_blanca_kilos || 0) + (report.harimasa_amarilla_kilos || 0) + (report.harimasa_fardo_kilos || 0);
+                const kilosTortilla = (consumedBultos * 41) + (consumedKilos * 2.05);
+                const dineroTotal = kilosTortilla * 24;
+                const dineroFormateado = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(dineroTotal);
+
                 pdf.setFontSize(22); pdf.setTextColor(217, 119, 6); pdf.text("XAVI", 105, 20, { align: "center" });
                 pdf.setFontSize(16); pdf.setTextColor(0, 0, 0); pdf.text("Reporte Diario de Consumo", 105, 30, { align: "center" });
                 pdf.setFontSize(12); pdf.text(`Sucursal: ${report.branch_name}`, 20, 45); pdf.text(`Fecha: ${report.report_date}`, 20, 52); pdf.text(`Enviado por: ${report.submitted_by}`, 20, 59);
+
                 pdf.setFontSize(14); pdf.setTextColor(217, 119, 6); pdf.text("Estado de Inventario", 20, 75);
                 pdf.setFontSize(12); pdf.setTextColor(0, 0, 0);
                 pdf.text(`Existencia Inicial: ${report.initial_stock_bultos} bts / ${report.initial_stock_kilos} kg`, 25, 83);
                 pdf.text(`Existencia Final: ${report.existencia_final_bultos} bts / ${report.existencia_final_kilos} kg`, 25, 90);
+
                 pdf.setFontSize(14); pdf.setTextColor(217, 119, 6); pdf.text("Desglose de Consumo", 20, 105);
                 pdf.setFontSize(12); pdf.setTextColor(0, 0, 0);
                 pdf.text(`- Maseca Premium: ${report.maseca_premium_bultos} bts / ${report.maseca_premium_kilos} kg`, 25, 113);
                 pdf.text(`- Harimasa Blanca: ${report.harimasa_blanca_bultos} bts / ${report.harimasa_blanca_kilos} kg`, 25, 120);
                 pdf.text(`- Harimasa Amarilla: ${report.harimasa_amarilla_bultos} bts / ${report.harimasa_amarilla_kilos} kg`, 25, 127);
                 pdf.text(`- Harimasa Fardo: ${report.harimasa_fardo_bultos} bts / ${report.harimasa_fardo_kilos} kg`, 25, 134);
+
                 pdf.setFontSize(14); pdf.setTextColor(217, 119, 6); pdf.text("Materiales Solicitados", 20, 150);
                 pdf.setFontSize(12); pdf.setTextColor(0, 0, 0);
                 pdf.text(`Papel: ${report.tiene_papel ? 'SÍ' : 'NO'}`, 25, 158);
                 pdf.text(`Teflón: ${report.tiene_teflon ? 'SÍ' : 'NO'}`, 25, 165);
                 pdf.text(`Grafito: ${report.tiene_grafito ? 'SÍ' : 'NO'}`, 25, 172);
-                pdf.setLineWidth(0.5); pdf.line(65, 230, 145, 230); pdf.setFontSize(12); pdf.text("Firma del Encargado de Sucursal", 105, 238, { align: "center" });
+
+                // 🔥 TEXTO DE DINERO EN EL PDF 🔥
+                pdf.setFontSize(14); pdf.setTextColor(21, 128, 61); 
+                pdf.text("Proyección de Ventas Estimada", 20, 190);
+                pdf.setFontSize(12); pdf.setTextColor(0, 0, 0);
+                pdf.text(`Total estimado en dinero: ${dineroFormateado}`, 25, 198);
+                pdf.setFontSize(10); pdf.setTextColor(100, 100, 100);
+                pdf.text(`* Calculado: ${kilosTortilla.toFixed(2)} kg de tortilla a $24/kg`, 25, 204);
+
+                pdf.setLineWidth(0.5); pdf.line(65, 250, 145, 250); pdf.setFontSize(12); pdf.text("Firma del Encargado de Sucursal", 105, 258, { align: "center" });
                 pdf.save(`Reporte_${report.report_date}.pdf`);
             } catch(e) { alert("Error crítico: " + e.message); }
         };
