@@ -159,6 +159,10 @@
                             <h2 class="text-2xl font-black text-amber-900 flex items-center gap-2"><i data-lucide="warehouse" class="w-6 h-6"></i> Bodega Principal</h2>
                             
                             <div class="flex flex-wrap gap-2 w-full xl:w-auto">
+                                <button onclick="window.openCostModal()" class="w-full sm:w-auto px-4 py-2.5 rounded-xl text-emerald-800 bg-emerald-100 hover:bg-emerald-200 font-bold flex justify-center items-center gap-2 shadow-sm transition-colors border border-emerald-200">
+                                    <i data-lucide="banknote" class="w-4 h-4"></i> Precio Kg: $<span id="current-cost-display">24</span>
+                                </button>
+
                                 <button onclick="window.resetBodega()" class="w-full sm:w-auto px-4 py-2.5 rounded-xl text-red-700 bg-red-50 hover:bg-red-100 font-bold flex justify-center items-center gap-2 shadow-sm transition-colors border border-red-200">
                                     <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reiniciar
                                 </button>
@@ -172,6 +176,7 @@
                                 </button>
                             </div>
                         </div>
+                        
                         <h3 class="font-bold text-amber-800 mb-3">Stock Disponible en Bodega</h3>
                         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8" id="bodega-stock-cards"></div>
                         <h3 class="text-xl font-bold text-amber-900 mb-4 border-b border-amber-100 pb-2">Historial de Movimientos</h3>
@@ -523,6 +528,23 @@
             </div>
         </div>
 
+        <div id="cost-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[80] transition-opacity">
+            <div class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl">
+                <h3 class="text-xl font-black text-slate-800 mb-4 flex items-center gap-2"><i data-lucide="coins"></i> Precio por Kilo</h3>
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-slate-600 mb-2">Nuevo Precio de Venta (MXN)</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400">$</span>
+                        <input type="number" id="input-tortilla-price" class="w-full pl-8 pr-4 py-3 rounded-xl border-2 border-slate-200 focus:border-emerald-500 outline-none font-bold text-xl" placeholder="24">
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="document.getElementById('cost-modal').classList.add('hidden')" class="flex-1 py-3 border-2 border-slate-200 font-bold rounded-xl hover:bg-slate-50">Cancelar</button>
+                    <button id="save-cost-btn" onclick="window.saveTortillaPrice()" class="flex-1 py-3 bg-emerald-600 text-white hover:bg-emerald-700 font-bold rounded-xl shadow-md">Actualizar</button>
+                </div>
+            </div>
+        </div>
+
         <div id="toast" class="hidden fixed bottom-4 right-4 sm:top-4 sm:bottom-auto w-[90%] sm:w-auto left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-auto bg-green-600 text-white px-6 py-4 rounded-xl shadow-2xl z-[100] text-center sm:text-left font-bold text-sm sm:text-base">
             <span id="toast-message"></span>
         </div>
@@ -546,6 +568,8 @@
         const db = getFirestore(app);
 
         // ================= VARIABLES GLOBALES =================
+        let precioTortilla = 24; // 🔥 AQUÍ LO AGREGAS 🔥
+
         let usersList = [];
         let branchesList = [];
         let reportsList = [];
@@ -1530,7 +1554,7 @@
             
             // 1 Bulto = 41 kg tortilla | 1 kg harina = 2.05 kg tortilla
             const kilosTortilla = (consumedBultos * 41) + (consumedKilos * 2.05);
-            const dineroTotal = kilosTortilla * 24;
+            const dineroTotal = kilosTortilla * precioTortilla;
             const dineroFormateado = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(dineroTotal);
 
             const date = new Date(dateStr + 'T12:00:00');
@@ -1552,7 +1576,7 @@
                     <div class="mt-4 p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-2 shadow-sm">
                         <div>
                             <h4 class="font-bold text-emerald-900 flex items-center justify-center sm:justify-start gap-1.5"><i data-lucide="circle-dollar-sign" class="w-5 h-5"></i> Equivalencia en Dinero</h4>
-                            <p class="text-[11px] text-emerald-700 mt-0.5 text-center sm:text-left">Aprox. ${kilosTortilla.toFixed(2)} kg de tortilla a $24/kg</p>
+                           <p class="text-[11px] text-emerald-700 mt-0.5 text-center sm:text-left">Aprox. ${kilosTortilla.toFixed(2)} kg de tortilla a $${precioTortilla}/kg</p>
                         </div>
                         <div class="text-2xl sm:text-3xl font-black text-emerald-800">
                             ${dineroFormateado}
@@ -1817,7 +1841,7 @@
                 pdf.setFontSize(12); pdf.setTextColor(0, 0, 0);
                 pdf.text(`Total estimado en dinero: ${dineroFormateado}`, 25, 198);
                 pdf.setFontSize(10); pdf.setTextColor(100, 100, 100);
-                pdf.text(`* Calculado: ${kilosTortilla.toFixed(2)} kg de tortilla a $24/kg`, 25, 204);
+                pdf.text(`* Calculado: ${kilosTortilla.toFixed(2)} kg de tortilla a $${precioTortilla}/kg`, 25, 204);
 
                 pdf.setLineWidth(0.5); pdf.line(65, 250, 145, 250); pdf.setFontSize(12); pdf.text("Firma del Encargado de Sucursal", 105, 258, { align: "center" });
                 pdf.save(`Reporte_${report.report_date}.pdf`);
@@ -1925,6 +1949,36 @@
 
         init();
         window.addEventListener('load', () => { setTimeout(window.hideLoadingScreen, 1500); });
+
+
+        // Cargar el precio desde la base de datos al iniciar
+onSnapshot(doc(db, 'config', 'precios'), (docSnap) => {
+    if (docSnap.exists()) {
+        precioTortilla = docSnap.data().tortilla_kg || 24;
+        const display = document.getElementById('current-cost-display');
+        if(display) display.textContent = precioTortilla;
+    }
+});
+
+window.openCostModal = function() {
+    document.getElementById('input-tortilla-price').value = precioTortilla;
+    document.getElementById('cost-modal').classList.remove('hidden');
+};
+
+window.saveTortillaPrice = async function() {
+    const nuevoPrecio = parseFloat(document.getElementById('input-tortilla-price').value);
+    if (!nuevoPrecio || nuevoPrecio <= 0) return alert("Ingresa un precio válido");
+
+    const btn = document.getElementById('save-cost-btn');
+    btn.innerHTML = 'Guardando...'; btn.disabled = true;
+
+    try {
+        await setDoc(doc(db, 'config', 'precios'), { tortilla_kg: nuevoPrecio });
+        window.showToast(`Precio actualizado a $${nuevoPrecio}`);
+        document.getElementById('cost-modal').classList.add('hidden');
+    } catch(e) { alert("Error: " + e.message); } 
+    finally { btn.innerHTML = 'Actualizar'; btn.disabled = false; }
+};
     </script>
 </body>
 </html>
