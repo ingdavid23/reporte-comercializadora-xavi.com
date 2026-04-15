@@ -212,7 +212,7 @@
                 </div>
 
                 <div class="flex flex-col-reverse sm:flex-row gap-3 mt-8">
-                    <button onclick="document.getElementById('edit-bodega-modal').classList.add('hidden')" class="w-full sm:flex-1 py-3 border-2 border-gray-200 font-bold rounded-xl hover:bg-gray-50">Cancelar</button> 
+                    <button onclick="document.getElementById('branch-modal').classList.add('hidden')" type="button" class="w-full sm:flex-1 py-3.5 border-2 border-amber-200 text-amber-700 font-bold rounded-xl hover:bg-amber-50 transition-colors">Cancelar</button>
                     <button id="save-edit-bodega-btn" onclick="window.saveEditBodega()" class="w-full sm:flex-1 py-3 bg-amber-600 text-white hover:bg-amber-700 font-bold rounded-xl shadow-md">Guardar Stock Exacto</button>
                 </div>
             </div>
@@ -350,6 +350,10 @@
                     <h4 class="font-bold text-amber-800 text-sm mt-6 border-b border-amber-100 pb-2">Inventario Asignado (Harinas)</h4>
                     <p class="text-xs text-amber-600 mb-3">Si editas y reduces la cantidad, los bultos sobrantes regresarán a la Bodega Principal automáticamente.</p>
                     
+                    <div id="branch-sync-warning" class="hidden p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-bold mb-3">
+                        ⚠️ El sistema registró un Total Global de <span id="bm-global-total" class="text-black bg-red-100 px-1 rounded"></span> en esta sucursal. Ajusta las casillas abajo para que sumen esa cantidad física real.
+                    </div>
+                    
                     <div class="grid grid-cols-2 gap-3">
                         <div class="p-3 border-2 border-amber-100 rounded-xl bg-gray-50/50">
                             <label class="block text-[11px] font-bold text-amber-600 uppercase mb-1">Maseca Premium</label>
@@ -381,9 +385,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex flex-col-reverse sm:flex-row gap-3 mt-8">
-                    <button onclick="window.closeBranchModal()" class="w-full sm:flex-1 py-3.5 border-2 border-amber-200 text-amber-700 font-bold rounded-xl hover:bg-amber-50 transition-colors">Cancelar</button>
-                    <button id="save-branch-btn" onclick="window.saveBranch()" class="w-full sm:flex-1 py-3.5 btn-primary text-white font-bold rounded-xl shadow-md">Guardar y Sincronizar</button>
+                <div class="flex flex-col-reverse sm:flex-row gap-3 mt-8 relative z-50">
+                    <button type="button" onclick="document.getElementById('branch-modal').classList.add('hidden'); return false;" class="w-full sm:flex-1 py-3.5 border-2 border-amber-200 text-amber-700 font-bold rounded-xl hover:bg-amber-50 transition-colors cursor-pointer">
+                        Cancelar
+                    </button>
+                    
+                    <button type="button" id="save-branch-btn" onclick="window.saveBranch(); return false;" class="w-full sm:flex-1 py-3.5 bg-amber-600 text-white font-bold rounded-xl shadow-md hover:bg-amber-700 cursor-pointer">
+                        Guardar y Sincronizar
+                    </button>
                 </div>
             </div>
         </div>
@@ -879,7 +888,6 @@
             try { await deleteDoc(doc(db, 'users', id)); window.showToast('Usuario eliminado'); } catch (e) { window.showToast('Error al eliminar', true); }
         };
 
-        // ================= CRUD SUCURSALES (CON MATEMÁTICAS A BODEGA) =================
         window.openBranchModal = function() {
             document.getElementById('branch-modal').classList.remove('hidden');
             document.getElementById('modal-branch-id').value = '';
@@ -889,65 +897,137 @@
                 if(el) el.value = '';
             });
             document.getElementById('branch-modal-title').textContent = 'Nueva Sucursal';
+            const warningEl = document.getElementById('branch-sync-warning');
+            if(warningEl) warningEl.classList.add('hidden');
         };
 
         window.editBranch = function(branchId) {
             const branch = window.getBranches().find(b => b.__backendId === branchId);
             if (!branch) return;
+            
             document.getElementById('branch-modal').classList.remove('hidden');
             document.getElementById('branch-modal-title').textContent = 'Editar Sucursal';
             document.getElementById('modal-branch-id').value = branchId;
             document.getElementById('modal-branch-name').value = branch.branch_name || '';
             
-            document.getElementById('mb-mas-b').value = branch.b_mas_b || 0; document.getElementById('mb-mas-k').value = branch.b_mas_k || 0;
-            document.getElementById('mb-bla-b').value = branch.b_bla_b || 0; document.getElementById('mb-bla-k').value = branch.b_bla_k || 0;
-            document.getElementById('mb-ama-b').value = branch.b_ama_b || 0; document.getElementById('mb-ama-k').value = branch.b_ama_k || 0;
-            document.getElementById('mb-far-b').value = branch.b_far_b || 0; document.getElementById('mb-far-k').value = branch.b_far_k || 0;
+            let tMasK = (branch.b_mas_b||0)*20 + (branch.b_mas_k||0);
+            let tBlaK = (branch.b_bla_b||0)*20 + (branch.b_bla_k||0);
+            let tAmaK = (branch.b_ama_b||0)*20 + (branch.b_ama_k||0);
+            let tFarK = (branch.b_far_b||0)*20 + (branch.b_far_k||0);
+
+            const totalSpecific = tMasK + tBlaK + tAmaK + tFarK;
+            const totalGlobal = (branch.initial_stock_bultos||0)*20 + (branch.initial_stock_kilos||0);
+
+            let isDesynced = false;
+
+            // 🔥 AUTO-CORRECCIÓN: Si el desglose es mayor al global por culpa de reportes viejos
+            if (totalSpecific > totalGlobal && totalGlobal > 0) {
+                let diff = totalSpecific - totalGlobal;
+                
+                // Restamos la diferencia automáticamente de las harinas
+                if (tMasK >= diff) { tMasK -= diff; diff = 0; } else { diff -= tMasK; tMasK = 0; }
+                if (diff > 0 && tBlaK >= diff) { tBlaK -= diff; diff = 0; } else if (diff > 0) { diff -= tBlaK; tBlaK = 0; }
+                if (diff > 0 && tAmaK >= diff) { tAmaK -= diff; diff = 0; } else if (diff > 0) { diff -= tAmaK; tAmaK = 0; }
+                if (diff > 0 && tFarK >= diff) { tFarK -= diff; diff = 0; }
+                
+                isDesynced = true;
+            } else if (totalGlobal > 0 && totalSpecific === 0) {
+                tMasK = totalGlobal; // Si no tenía desglose, se lo asignamos todo a Maseca
+                isDesynced = true;
+            } else if (totalGlobal !== totalSpecific) {
+                isDesynced = true;
+            }
+
+            // Llenar las casillas ya calculadas y cuadraditas
+            document.getElementById('mb-mas-b').value = Math.floor(tMasK/20); document.getElementById('mb-mas-k').value = tMasK%20;
+            document.getElementById('mb-bla-b').value = Math.floor(tBlaK/20); document.getElementById('mb-bla-k').value = tBlaK%20;
+            document.getElementById('mb-ama-b').value = Math.floor(tAmaK/20); document.getElementById('mb-ama-k').value = tAmaK%20;
+            document.getElementById('mb-far-b').value = Math.floor(tFarK/20); document.getElementById('mb-far-k').value = tFarK%20;
+
+            const warningEl = document.getElementById('branch-sync-warning');
+            if (warningEl) {
+                if (isDesynced) {
+                    warningEl.classList.remove('hidden');
+                    warningEl.innerHTML = `⚠️ <b>Sincronización Automática:</b> Los reportes antiguos desfasaron el desglose. El sistema pre-ajustó las casillas para que coincidan con los <b>${branch.initial_stock_bultos||0}b ${branch.initial_stock_kilos||0}k</b> reales. Solo revisa y presiona Guardar.`;
+                } else {
+                    warningEl.classList.add('hidden');
+                }
+            }
         };
 
-        window.closeBranchModal = function() { document.getElementById('branch-modal').classList.add('hidden'); };
-
         window.saveBranch = async function() {
-            if (isSubmitting) return;
+            if (typeof isSubmitting !== 'undefined' && isSubmitting) return;
+            
             const branchId = document.getElementById('modal-branch-id').value;
             const name = document.getElementById('modal-branch-name').value.trim();
             if (!name) return window.showToast('Ingrese el nombre de la sucursal', true);
             
             const branch = branchId ? window.getBranches().find(b => b.__backendId === branchId) : null;
             
-            const getV = (id) => parseInt(document.getElementById(id).value) || 0;
+            // Función segura para leer inputs sin que regresen 'undefined'
+            const getV = (id) => {
+                const el = document.getElementById(id);
+                return el && el.value ? parseInt(el.value) : 0;
+            };
+            
             const nMasB = getV('mb-mas-b'), nMasK = getV('mb-mas-k');
             const nBlaB = getV('mb-bla-b'), nBlaK = getV('mb-bla-k');
             const nAmaB = getV('mb-ama-b'), nAmaK = getV('mb-ama-k');
             const nFarB = getV('mb-far-b'), nFarK = getV('mb-far-k');
 
-            isSubmitting = true;
+            if (typeof isSubmitting !== 'undefined') isSubmitting = true;
             const btn = document.getElementById('save-branch-btn');
-            btn.innerHTML = '<i class="lucide-loader animate-spin inline w-4 h-4 mr-2"></i> Sincronizando...';
-            btn.disabled = true;
+            if (btn) { btn.innerHTML = '<i class="lucide-loader animate-spin inline w-4 h-4 mr-2"></i> Guardando...'; btn.disabled = true; }
 
             try {
-                const calcD = (oB, oK, nB, nK) => ((nB||0)*20 + (nK||0)) - ((oB||0)*20 + (oK||0));
-                const dMas = calcD(branch?.b_mas_b, branch?.b_mas_k, nMasB, nMasK);
-                const dBla = calcD(branch?.b_bla_b, branch?.b_bla_k, nBlaB, nBlaK);
-                const dAma = calcD(branch?.b_ama_b, branch?.b_ama_k, nAmaB, nAmaK);
-                const dFar = calcD(branch?.b_far_b, branch?.b_far_k, nFarB, nFarK);
-
-                const aplD = (cB, cK, delta) => {
-                    let t = ((cB||0)*20 + (cK||0)) - delta; 
-                    return { b: (t<0?-1:1)*Math.floor(Math.abs(t)/20), k: (t<0?-1:1)*(Math.abs(t)%20) };
-                };
-                const fMas = aplD(bodegaStock.maseca_bultos, bodegaStock.maseca_kilos, dMas);
-                const fBla = aplD(bodegaStock.blanca_bultos, bodegaStock.blanca_kilos, dBla);
-                const fAma = aplD(bodegaStock.amarilla_bultos, bodegaStock.amarilla_kilos, dAma);
-                const fFar = aplD(bodegaStock.fardo_bultos, bodegaStock.fardo_kilos, dFar);
-
-                await setDoc(doc(db, 'bodega', 'main'), {
-                    maseca_bultos: fMas.b, maseca_kilos: fMas.k, blanca_bultos: fBla.b, blanca_kilos: fBla.k,
-                    amarilla_bultos: fAma.b, amarilla_kilos: fAma.k, fardo_bultos: fFar.b, fardo_kilos: fFar.k
-                });
+                // Verificamos si estamos corrigiendo un desfase de reportes antiguos
+                const oldGlobal = branch ? ((branch.initial_stock_bultos||0)*20 + (branch.initial_stock_kilos||0)) : 0;
+                const oldSpecific = branch ? (((branch.b_mas_b||0)+(branch.b_bla_b||0)+(branch.b_ama_b||0)+(branch.b_far_b||0))*20 + (branch.b_mas_k||0)+(branch.b_bla_k||0)+(branch.b_ama_k||0)+(branch.b_far_k||0)) : 0;
+                const isFixingDesync = branch && (oldGlobal !== oldSpecific);
 
                 const totalKilos = (nMasB+nBlaB+nAmaB+nFarB)*20 + (nMasK+nBlaK+nAmaK+nFarK);
+
+                // 🔥 Solo afectamos a la Bodega si NO estamos arreglando un desfase viejo 🔥
+                if (!isFixingDesync) {
+                    const calcD = (oB, oK, nB, nK) => ((nB||0)*20 + (nK||0)) - ((oB||0)*20 + (oK||0));
+                    const dMas = calcD(branch?.b_mas_b, branch?.b_mas_k, nMasB, nMasK);
+                    const dBla = calcD(branch?.b_bla_b, branch?.b_bla_k, nBlaB, nBlaK);
+                    const dAma = calcD(branch?.b_ama_b, branch?.b_ama_k, nAmaB, nAmaK);
+                    const dFar = calcD(branch?.b_far_b, branch?.b_far_k, nFarB, nFarK);
+
+                    const aplD = (cB, cK, delta) => {
+                        let t = ((cB||0)*20 + (cK||0)) - delta; 
+                        return { b: (t<0?-1:1)*Math.floor(Math.abs(t)/20), k: (t<0?-1:1)*(Math.abs(t)%20) };
+                    };
+                    
+                    const fMas = aplD(bodegaStock.maseca_bultos, bodegaStock.maseca_kilos, dMas);
+                    const fBla = aplD(bodegaStock.blanca_bultos, bodegaStock.blanca_kilos, dBla);
+                    const fAma = aplD(bodegaStock.amarilla_bultos, bodegaStock.amarilla_kilos, dAma);
+                    const fFar = aplD(bodegaStock.fardo_bultos, bodegaStock.fardo_kilos, dFar);
+
+                    await setDoc(doc(db, 'bodega', 'main'), {
+                        maseca_bultos: fMas.b, maseca_kilos: fMas.k, blanca_bultos: fBla.b, blanca_kilos: fBla.k,
+                        amarilla_bultos: fAma.b, amarilla_kilos: fAma.k, fardo_bultos: fFar.b, fardo_kilos: fFar.k
+                    });
+
+                    if (dMas !== 0 || dBla !== 0 || dAma !== 0 || dFar !== 0) {
+                        const isReturn = (dMas + dBla + dAma + dFar) < 0; 
+                        const absB = (delta) => Math.floor(Math.abs(delta)/20);
+                        const absK = (delta) => Math.abs(delta)%20;
+
+                        await addDoc(collection(db, 'bodega_movements'), {
+                            type: isReturn ? 'entrada' : 'salida',
+                            date: new Date().toISOString(), user: currentUser.username,
+                            branch_name: name + (isReturn ? ' (Dev. Edición)' : ' (Ajuste Edición)'),
+                            maseca_bultos: absB(dMas), maseca_kilos: absK(dMas),
+                            blanca_bultos: absB(dBla), blanca_kilos: absK(dBla),
+                            amarilla_bultos: absB(dAma), amarilla_kilos: absK(dAma),
+                            fardo_bultos: absB(dFar), fardo_kilos: absK(dFar)
+                        });
+                    }
+                }
+
+                // Guardamos los datos nuevos en la sucursal
                 const branchData = {
                     branch_name: name,
                     initial_stock_bultos: Math.floor(totalKilos/20), initial_stock_kilos: totalKilos%20,
@@ -957,38 +1037,31 @@
 
                 if (branchId) {
                     await updateDoc(doc(db, 'branches', branchId), branchData);
-                    window.showToast('Sucursal actualizada exitosamente');
+                    window.showToast(isFixingDesync ? 'Sucursal auto-corregida con éxito' : 'Sucursal actualizada');
                 } else {
                     branchData.type = 'branch';
                     await addDoc(collection(db, 'branches'), branchData);
                     window.showToast('Sucursal creada exitosamente');
                 }
 
-                if (dMas !== 0 || dBla !== 0 || dAma !== 0 || dFar !== 0) {
-                    const isReturn = (dMas + dBla + dAma + dFar) < 0; 
-                    const absB = (delta) => Math.floor(Math.abs(delta)/20);
-                    const absK = (delta) => Math.abs(delta)%20;
+                // 🔥 CIERRE FORZADO Y ACTUALIZACIÓN DE PANTALLA 🔥
+                document.getElementById('branch-modal').classList.add('hidden');
+                if (typeof window.renderBranches === 'function') window.renderBranches();
 
-                    await addDoc(collection(db, 'bodega_movements'), {
-                        type: isReturn ? 'entrada' : 'salida',
-                        date: new Date().toISOString(), user: currentUser.username,
-                        branch_name: name + (isReturn ? ' (Devolución por Edición)' : ' (Ajuste por Edición)'),
-                        maseca_bultos: absB(dMas), maseca_kilos: absK(dMas),
-                        blanca_bultos: absB(dBla), blanca_kilos: absK(dBla),
-                        amarilla_bultos: absB(dAma), amarilla_kilos: absK(dAma),
-                        fardo_bultos: absB(dFar), fardo_kilos: absK(dFar)
-                    });
-                }
-                window.closeBranchModal();
-            } catch (error) { window.showToast('Error al procesar sucursal', true); console.error(error); } 
-            finally { isSubmitting = false; btn.innerHTML = 'Guardar y Sincronizar'; btn.disabled = false; }
+            } catch (error) { 
+                console.error(error);
+                alert("🚨 DETALLE DEL ERROR (Tómale captura si vuelve a salir): \n" + error.message);
+                window.showToast('Error al procesar sucursal', true); 
+            } finally { 
+                if (typeof isSubmitting !== 'undefined') isSubmitting = false; 
+                if (btn) { btn.innerHTML = 'Guardar y Sincronizar'; btn.disabled = false; } 
+            }
         };
 
         window.deleteBranch = async function(id) {
             if (!confirm("¿Seguro que deseas eliminar esta sucursal?")) return;
             try { await deleteDoc(doc(db, 'branches', id)); window.showToast('Sucursal eliminada'); } catch (e) { window.showToast('Error al eliminar', true); }
         };
-
         // ================= BODEGA PRINCIPAL Y RECARGA =================
         window.toggleBodegaHistory = function() {
             isBodegaHistoryMinimized = !isBodegaHistoryMinimized;
@@ -1471,6 +1544,17 @@
                 const totalInitialKilos = ((branch.initial_stock_bultos || 0) * 20) + (branch.initial_stock_kilos || 0);
                 let newTotalKilos = Math.max(0, totalInitialKilos - totalConsumedKilos);
                 
+                // 🔥 LÓGICA CORREGIDA: Restar el consumo de los subtipos específicos de harina en la sucursal 🔥
+                const subtractF = (cB, cK, subB, subK) => {
+                    let total = ((cB||0)*20 + (cK||0)) - ((subB||0)*20 + (subK||0));
+                    return { b: Math.max(0, Math.floor(total/20)), k: Math.max(0, total%20) };
+                };
+                
+                const fMas = subtractF(branch.b_mas_b, branch.b_mas_k, getVal('maseca-bultos'), getVal('maseca-kilos'));
+                const fBla = subtractF(branch.b_bla_b, branch.b_bla_k, getVal('harimasa-blanca-bultos'), getVal('harimasa-blanca-kilos'));
+                const fAma = subtractF(branch.b_ama_b, branch.b_ama_k, getVal('harimasa-amarilla-bultos'), getVal('harimasa-amarilla-kilos'));
+                const fFar = subtractF(branch.b_far_b, branch.b_far_k, getVal('harimasa-fardo-bultos'), getVal('harimasa-fardo-kilos'));
+
                 const chkPapel = document.querySelector('input[name="papel"]:checked');
                 const chkTeflon = document.querySelector('input[name="teflon"]:checked');
                 const chkGrafito = document.querySelector('input[name="grafito"]:checked');
@@ -1490,7 +1574,16 @@
                 };
 
                 await addDoc(collection(db, 'reports'), reportData);
-                await updateDoc(doc(db, 'branches', branch.__backendId), { initial_stock_bultos: Math.floor(newTotalKilos / 20), initial_stock_kilos: newTotalKilos % 20 });
+                
+                // Actualizamos la sucursal con el Total Global Y los Desgloses Específicos
+                await updateDoc(doc(db, 'branches', branch.__backendId), { 
+                    initial_stock_bultos: Math.floor(newTotalKilos / 20), 
+                    initial_stock_kilos: newTotalKilos % 20,
+                    b_mas_b: fMas.b, b_mas_k: fMas.k,
+                    b_bla_b: fBla.b, b_bla_k: fBla.k,
+                    b_ama_b: fAma.b, b_ama_k: fAma.k,
+                    b_far_b: fFar.b, b_far_k: fFar.k
+                });
 
                 window.showToast('¡Reporte enviado exitosamente!');
                 if (typeof window.limpiarFormularioEmpleado === 'function') window.limpiarFormularioEmpleado();
