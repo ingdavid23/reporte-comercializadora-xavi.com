@@ -1044,11 +1044,21 @@
                     window.showToast('Sucursal creada exitosamente');
                 }
 
-                // 🔥 CIERRE FORZADO Y ACTUALIZACIÓN DE PANTALLA 🔥
-                document.getElementById('branch-modal').classList.add('hidden');
+              // 🔥 ACTUALIZACIÓN EN VIVO SIN PERDER SESIÓN 🔥
+              document.getElementById('branch-modal').classList.add('hidden');
+                
+                // Actualizamos la memoria interna al instante para no recargar el navegador
+                if (branch) {
+                    Object.assign(branch, branchData);
+                } else if (typeof branchesList !== 'undefined') {
+                    branchData.__backendId = "temp_" + Date.now();
+                    branchesList.push(branchData);
+                }
+
+                // Refrescamos los cuadros de la pantalla en un parpadeo
                 if (typeof window.renderBranches === 'function') window.renderBranches();
 
-            } catch (error) { 
+            } catch (error) {
                 console.error(error);
                 alert("🚨 DETALLE DEL ERROR (Tómale captura si vuelve a salir): \n" + error.message);
                 window.showToast('Error al procesar sucursal', true); 
