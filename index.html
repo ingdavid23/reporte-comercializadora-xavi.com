@@ -888,6 +888,34 @@
             if(typeof lucide !== 'undefined') lucide.createIcons();
         };
 
+        // ================= ACTUALIZAR SELECTS DE SUCURSALES =================
+        window.updateBranchSelects = function() {
+            const branches = window.getBranches() || [];
+            let optionsHTML = '<option value="">-- Seleccione --</option>';
+            
+            // Recorrer las sucursales para crear las opciones
+            branches.forEach(branch => {
+                // Usamos branch_name como value ya que así lo filtra tu lógica de reportes
+                optionsHTML += `<option value="${branch.branch_name}">${branch.branch_name}</option>`;
+            });
+
+            // 1. Actualizar el select en Historial de Reportes
+            const reportSelect = document.getElementById('report-branch-select');
+            if (reportSelect) {
+                const currentVal = reportSelect.value; // Guardar selección actual si existe
+                reportSelect.innerHTML = optionsHTML;
+                if (currentVal) reportSelect.value = currentVal;
+            }
+
+            // 2. Actualizar el select en el Modal de Usuarios
+            const modalBranchSelect = document.getElementById('modal-branch');
+            if (modalBranchSelect) {
+                const currentVal = modalBranchSelect.value;
+                modalBranchSelect.innerHTML = optionsHTML;
+                if (currentVal) modalBranchSelect.value = currentVal;
+            }
+        };
+
         window.openBranchModal = function() {
             document.getElementById('branch-modal').classList.remove('hidden');
             document.getElementById('modal-branch-id').value = '';
